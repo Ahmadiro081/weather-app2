@@ -1,0 +1,6 @@
+{
+  "name": "Weather App",
+  "description": "Undergraduate mini-project weather application using OpenWeather API for real-time weather information in Nigerian cities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

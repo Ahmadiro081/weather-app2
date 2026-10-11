@@ -1,0 +1,454 @@
+/**
+ * ============================================================================
+ * Weather App - Main JavaScript Application File (Vercel Architecture)
+ * University Undergraduate Mini-Project: "WEATHER APP USING PUBLIC API"
+ * ============================================================================
+ * 
+ * Topics Demonstrated:
+ * 1. DOM Selection and Event Listeners
+ * 2. Asynchronous JavaScript (async / await)
+ * 3. Fetch API and HTTP GET Requests to Serverless Proxy (/api/weather)
+ * 4. JSON Parsing and Data Extraction
+ * 5. Dynamic DOM Manipulation and State Management
+ * 6. Defensive Error Handling & Input Validation
+ * 7. Browser Session History Management
+ * 8. Server-Side Secret Protection (Zero API keys in client-side code)
+ */
+
+// ============================================================================
+// 1. STATE & CONSTANTS
+// ============================================================================
+
+// Session search history array (stores recent successful queries this session)
+let searchHistory = [];
+
+// Track active fetch request state to prevent duplicate concurrent queries
+let isLoading = false;
+
+// Country code mapping for friendly display
+const countryNames = {
+  NG: "Nigeria",
+  GH: "Ghana",
+  KE: "Kenya",
+  ZA: "South Africa",
+  EG: "Egypt",
+  GB: "United Kingdom",
+  US: "United States",
+  CA: "Canada"
+};
+
+// ============================================================================
+// 2. DOM ELEMENT REFERENCES
+// ============================================================================
+
+const searchForm = document.getElementById("searchForm");
+const cityInput = document.getElementById("cityInput");
+const searchButton = document.getElementById("searchButton");
+const quickCityButtons = document.querySelectorAll(".quick-btn");
+
+const loadingState = document.getElementById("loadingState");
+const alertBox = document.getElementById("alertBox");
+const alertTitle = document.getElementById("alertTitle");
+const alertMessage = document.getElementById("alertMessage");
+
+const weatherCard = document.getElementById("weatherCard");
+const initialPlaceholder = document.getElementById("initialPlaceholder");
+
+const cityNameElem = document.getElementById("cityName");
+const countryNameElem = document.getElementById("countryName");
+const weatherDateElem = document.getElementById("weatherDate");
+const currentTempElem = document.getElementById("currentTemp");
+const feelsLikeElem = document.getElementById("feelsLike");
+const weatherConditionElem = document.getElementById("weatherCondition");
+const weatherDescriptionElem = document.getElementById("weatherDescription");
+const weatherIconElem = document.getElementById("weatherIcon");
+
+const humidityValueElem = document.getElementById("humidityValue");
+const windSpeedValueElem = document.getElementById("windSpeedValue");
+const pressureValueElem = document.getElementById("pressureValue");
+const visibilityValueElem = document.getElementById("visibilityValue");
+
+const historyContainer = document.getElementById("historyContainer");
+const historyChips = document.getElementById("historyChips");
+
+const forecastSection = document.getElementById("forecastSection");
+const forecastGrid = document.getElementById("forecastGrid");
+
+// ============================================================================
+// 3. API INTEGRATION LOGIC (VERCEL SERVERLESS PROXY)
+// ============================================================================
+
+/**
+ * Dedicated function to fetch real-time weather data.
+ * Calls the secure Vercel serverless proxy endpoint: /api/weather?city={cityName}
+ * The server securely injects OPENWEATHER_API_KEY without exposing it to the client.
+ *
+ * @param {string} cityName - Name of the city to query
+ * @returns {Promise<Object>} - Parsed JSON response object
+ */
+async function fetchWeatherData(cityName) {
+  const query = cityName ? cityName.trim() : "";
+  if (!query) {
+    throw new Error("EMPTY_INPUT");
+  }
+
+  // Target Vercel serverless endpoint
+  const endpoint = (typeof APP_CONFIG !== "undefined" && APP_CONFIG.WEATHER_API_ENDPOINT)
+    ? APP_CONFIG.WEATHER_API_ENDPOINT
+    : "/api/weather";
+
+  const url = `${endpoint}?city=${encodeURIComponent(query)}`;
+
+  // Execute asynchronous HTTP GET request
+  const response = await fetch(url);
+
+  // Safely parse JSON response payload
+  const payload = await response.json().catch(() => null);
+
+  // Handle HTTP error status codes from the serverless API
+  if (!response.ok) {
+    const serverMessage = payload && payload.error ? payload.error : "";
+    if (response.status === 404) {
+      throw new Error("CITY_NOT_FOUND");
+    } else if (response.status === 401) {
+      throw new Error(serverMessage || "INVALID_API_KEY");
+    } else if (response.status === 429) {
+      throw new Error("RATE_LIMIT_EXCEEDED");
+    } else if (response.status === 400) {
+      throw new Error("EMPTY_INPUT");
+    } else {
+      throw new Error(serverMessage || "SERVER_ERROR");
+    }
+  }
+
+  if (!payload) {
+    throw new Error("SERVER_ERROR");
+  }
+
+  return payload;
+}
+
+// ============================================================================
+// 4. UI RENDERING & DOM MANIPULATION
+// ============================================================================
+
+/**
+ * Renders the fetched weather data into the UI components.
+ * 
+ * @param {Object} data - Clean JSON object from serverless API
+ */
+function renderWeatherData(data) {
+  hideLoadingState();
+  hideError();
+
+  // Extract core fields from JSON payload
+  const city = data.name;
+  const countryCode = data.sys && data.sys.country ? data.sys.country : "";
+  const countryDisplayName = countryNames[countryCode] || countryCode || "";
+
+  // Temperatures in Celsius (rounded to nearest integer)
+  const temp = typeof data.main?.temp === "number" ? Math.round(data.main.temp) : "--";
+  const feelsLike = typeof data.main?.feels_like === "number" ? Math.round(data.main.feels_like) : "--";
+
+  // Weather description & conditions
+  const weatherObj = data.weather && data.weather.length > 0 ? data.weather[0] : null;
+  const condition = weatherObj ? weatherObj.main : "Clear";
+  const description = weatherObj ? weatherObj.description : "No description available";
+  const iconCode = weatherObj ? weatherObj.icon : "01d";
+
+  // Detailed atmospheric metrics
+  const humidity = data.main?.humidity !== undefined ? data.main.humidity : "--";
+  const windSpeed = typeof data.wind?.speed === "number" ? data.wind.speed.toFixed(1) : "0.0";
+  const pressure = data.main?.pressure !== undefined ? data.main.pressure : "--";
+  
+  // Visibility in meters -> convert to kilometers
+  let visibilityDisplay = "N/A";
+  if (typeof data.visibility === "number") {
+    const visKm = (data.visibility / 1000).toFixed(1);
+    visibilityDisplay = `${visKm} km`;
+  }
+
+  // Update text content across elements
+  cityNameElem.textContent = city;
+  countryNameElem.textContent = countryDisplayName ? `, ${countryDisplayName}` : "";
+  weatherDateElem.textContent = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
+
+  currentTempElem.textContent = `${temp}`;
+  feelsLikeElem.textContent = `Feels Like: ${feelsLike}°C`;
+  weatherConditionElem.textContent = condition;
+  weatherDescriptionElem.textContent = description;
+
+  // Use official OpenWeather icon asset (2x resolution)
+  weatherIconElem.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+  weatherIconElem.alt = description;
+
+  // Update metrics grid
+  humidityValueElem.textContent = `${humidity}%`;
+  windSpeedValueElem.textContent = `${windSpeed} m/s`;
+  pressureValueElem.textContent = `${pressure} hPa`;
+  visibilityValueElem.textContent = visibilityDisplay;
+
+  // Reveal weather card and hide initial placeholder
+  if (initialPlaceholder) initialPlaceholder.style.display = "none";
+  weatherCard.classList.add("active");
+
+  // Render 5-day weather forecast with upcoming high and low temperatures
+  renderForecast(data.forecast);
+
+  // Add to session search history
+  addToSessionHistory(city);
+}
+
+/**
+ * Renders the 5-day weather forecast section.
+ * 
+ * @param {Array} forecastList - Array of daily forecast objects
+ */
+function renderForecast(forecastList) {
+  if (!forecastSection || !forecastGrid) return;
+
+  if (!Array.isArray(forecastList) || forecastList.length === 0) {
+    forecastSection.style.display = "none";
+    forecastSection.classList.remove("active");
+    return;
+  }
+
+  forecastGrid.innerHTML = "";
+
+  forecastList.forEach(day => {
+    const card = document.createElement("div");
+    card.className = "forecast-card";
+
+    const conditionText = day.condition || "Clear";
+    const descText = day.description || conditionText;
+    const iconCode = day.icon || "01d";
+
+    card.innerHTML = `
+      <div class="forecast-day-wrap">
+        <span class="forecast-day">${day.dayName || ""}</span>
+        <span class="forecast-date">${day.formattedDate || ""}</span>
+      </div>
+      <div class="forecast-condition-wrap">
+        <img class="forecast-icon-img" src="https://openweathermap.org/img/wn/${iconCode}@2x.png" alt="${descText}">
+        <span class="forecast-condition" title="${descText}">${conditionText}</span>
+      </div>
+      <div class="forecast-temp-range" title="Upcoming High: ${day.tempMax}°C | Low: ${day.tempMin}°C">
+        <span class="temp-high" title="Upcoming High">${day.tempMax}</span>
+        <span class="temp-separator">/</span>
+        <span class="temp-low" title="Upcoming Low">${day.tempMin}</span>
+      </div>
+    `;
+
+    forecastGrid.appendChild(card);
+  });
+
+  forecastSection.style.display = "block";
+  forecastSection.classList.add("active");
+}
+
+/**
+ * Activates loading state: shows spinner and disables search buttons.
+ */
+function showLoadingState() {
+  isLoading = true;
+  hideError();
+  loadingState.classList.add("active");
+  searchButton.disabled = true;
+  searchButton.innerHTML = `
+    <span class="spinner" style="width: 18px; height: 18px; border-width: 2px;"></span>
+    <span>Searching...</span>
+  `;
+}
+
+/**
+ * Deactivates loading state and restores interactive buttons.
+ */
+function hideLoadingState() {
+  isLoading = false;
+  loadingState.classList.remove("active");
+  searchButton.disabled = false;
+  searchButton.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <span>Search</span>
+  `;
+}
+
+/**
+ * Displays user-friendly error message based on error classification.
+ * 
+ * @param {string} type - Error classification identifier
+ * @param {string} customMsg - Optional specific message
+ */
+function showError(type, customMsg = "") {
+  hideLoadingState();
+  if (forecastSection) {
+    forecastSection.style.display = "none";
+    forecastSection.classList.remove("active");
+  }
+
+  let title = "Notice";
+  let message = "Unable to retrieve weather information. Please try again.";
+
+  switch (type) {
+    case "EMPTY_INPUT":
+      title = "Input Required";
+      message = "Please enter a city name.";
+      break;
+    case "CITY_NOT_FOUND":
+      title = "City Not Found";
+      message = "City not found. Please check the spelling and try again.";
+      break;
+    case "RATE_LIMIT_EXCEEDED":
+      title = "Rate Limit Reached";
+      message = "API rate limit reached. Please wait a few moments and try again.";
+      break;
+    case "NETWORK_ERROR":
+      title = "Network Connection Issue";
+      message = "Network error. Please check your internet connection and try again.";
+      break;
+    default:
+      if (customMsg) {
+        message = customMsg;
+      }
+      break;
+  }
+
+  alertTitle.textContent = title;
+  alertMessage.textContent = message;
+  alertBox.classList.add("active");
+}
+
+/**
+ * Dismisses error alert box.
+ */
+function hideError() {
+  alertBox.classList.remove("active");
+}
+
+// ============================================================================
+// 5. SESSION SEARCH HISTORY
+// ============================================================================
+
+/**
+ * Adds queried city to session search history.
+ * 
+ * @param {string} city - Name of the queried city
+ */
+function addToSessionHistory(city) {
+  const normalized = city.trim();
+  if (!searchHistory.includes(normalized)) {
+    searchHistory.unshift(normalized);
+    if (searchHistory.length > 5) {
+      searchHistory.pop(); // Keep maximum 5 recent queries
+    }
+    renderSessionHistory();
+  }
+}
+
+/**
+ * Renders interactive chips for quick re-searching.
+ */
+function renderSessionHistory() {
+  if (searchHistory.length === 0) {
+    historyContainer.classList.remove("active");
+    return;
+  }
+
+  historyChips.innerHTML = "";
+  searchHistory.forEach(city => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "history-chip";
+    chip.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+      <span>${city}</span>
+    `;
+    chip.addEventListener("click", () => {
+      cityInput.value = city;
+      handleSearch(city);
+    });
+    historyChips.appendChild(chip);
+  });
+
+  historyContainer.classList.add("active");
+}
+
+// ============================================================================
+// 6. CONTROLLER & EVENT COORDINATION
+// ============================================================================
+
+/**
+ * Main coordinator function for initiating and resolving a city search.
+ * 
+ * @param {string} cityName - Name of the target city
+ */
+async function handleSearch(cityName) {
+  if (isLoading) return;
+
+  const query = cityName ? cityName.trim() : "";
+
+  // Validation: Check for empty input
+  if (!query) {
+    showError("EMPTY_INPUT");
+    cityInput.focus();
+    return;
+  }
+
+  showLoadingState();
+
+  try {
+    const weatherData = await fetchWeatherData(query);
+    renderWeatherData(weatherData);
+  } catch (error) {
+    console.error("Weather query failed:", error);
+
+    if (error.message === "CITY_NOT_FOUND") {
+      showError("CITY_NOT_FOUND");
+    } else if (error.message === "EMPTY_INPUT") {
+      showError("EMPTY_INPUT");
+    } else if (error.message === "RATE_LIMIT_EXCEEDED") {
+      showError("RATE_LIMIT_EXCEEDED");
+    } else if (error instanceof TypeError && error.message.includes("fetch")) {
+      showError("NETWORK_ERROR");
+    } else {
+      showError("SERVER_ERROR", error.message || "Unable to retrieve weather information. Please try again.");
+    }
+  }
+}
+
+// ============================================================================
+// 7. EVENT LISTENERS SETUP
+// ============================================================================
+
+// Form submit event
+searchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  handleSearch(cityInput.value);
+});
+
+// Quick city button clicks (Abuja & Lagos)
+quickCityButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const city = btn.getAttribute("data-city");
+    if (city) {
+      cityInput.value = city;
+      handleSearch(city);
+    }
+  });
+});
+
+// Initial boot: focus input
+document.addEventListener("DOMContentLoaded", () => {
+  cityInput.focus();
+});

@@ -1,0 +1,11 @@
+# Environment & Secrets
+.env
+.env.local
+.env*.local
+*.key
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
