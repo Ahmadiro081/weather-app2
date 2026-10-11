@@ -3,6 +3,7 @@ package com.example.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -458,7 +459,7 @@ fun WeatherScreen(viewModel: WeatherViewModel) {
         // Weather Data Card & 5-Day Forecast (Success State)
         AnimatedVisibility(
           visible = state.uiState is WeatherUiState.Success,
-          enter = fadeIn(),
+          enter = fadeIn() + scaleIn(initialScale = 0.96f),
           exit = fadeOut()
         ) {
           val success = (state.uiState as? WeatherUiState.Success)

@@ -221,9 +221,15 @@ function renderWeatherData(data) {
   pressureValueElem.textContent = `${pressure} hPa`;
   visibilityValueElem.textContent = visibilityDisplay;
 
-  // Reveal weather card and hide initial placeholder
+  // Reveal weather card with subtle fade-in and scale-up animation
   if (initialPlaceholder) initialPlaceholder.style.display = "none";
-  weatherCard.classList.add("active");
+  if (weatherCard) {
+    weatherCard.classList.remove("active");
+    weatherCard.classList.remove("animate-card");
+    void weatherCard.offsetWidth; // Force reflow to smoothly re-trigger fade-in and scale-up animation
+    weatherCard.classList.add("active");
+    weatherCard.classList.add("animate-card");
+  }
 
   // Render 5-day weather forecast with upcoming high and low temperatures
   renderForecast(data.forecast);
