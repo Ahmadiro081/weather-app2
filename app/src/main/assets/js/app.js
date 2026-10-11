@@ -92,6 +92,11 @@ async function fetchWeatherData(cityName) {
     throw new Error("EMPTY_INPUT");
   }
 
+  // Pre-flight check: Verify connectivity before network dispatch
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    throw new Error("OFFLINE");
+  }
+
   // Target Vercel serverless endpoint
   const endpoint = (typeof APP_CONFIG !== "undefined" && APP_CONFIG.WEATHER_API_ENDPOINT)
     ? APP_CONFIG.WEATHER_API_ENDPOINT
@@ -108,7 +113,9 @@ async function fetchWeatherData(cityName) {
   // Handle HTTP error status codes from the serverless API
   if (!response.ok) {
     const serverMessage = payload && payload.error ? payload.error : "";
-    if (response.status === 404) {
+    if (payload && payload.offline) {
+      throw new Error("OFFLINE");
+    } else if (response.status === 404) {
       throw new Error("CITY_NOT_FOUND");
     } else if (response.status === 401) {
       throw new Error(serverMessage || "INVALID_API_KEY");
@@ -186,6 +193,27 @@ function renderWeatherData(data) {
   // Use official OpenWeather icon asset (2x resolution)
   weatherIconElem.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
   weatherIconElem.alt = description;
+
+  // Trigger subtle CSS animation on temperature display
+  if (currentTempElem) {
+    currentTempElem.classList.remove("animate-update");
+    void currentTempElem.offsetWidth; // Force reflow to re-trigger animation
+    currentTempElem.classList.add("animate-update");
+  }
+
+  // Trigger subtle CSS animation on weather icon
+  if (weatherIconElem) {
+    weatherIconElem.classList.remove("animate-update");
+    void weatherIconElem.offsetWidth; // Force reflow to re-trigger animation
+    weatherIconElem.classList.add("animate-update");
+
+    // Also smoothly re-trigger once newly fetched icon image finishes loading
+    weatherIconElem.onload = () => {
+      weatherIconElem.classList.remove("animate-update");
+      void weatherIconElem.offsetWidth;
+      weatherIconElem.classList.add("animate-update");
+    };
+  }
 
   // Update metrics grid
   humidityValueElem.textContent = `${humidity}%`;
@@ -302,6 +330,10 @@ function showError(type, customMsg = "") {
       title = "Input Required";
       message = "Please enter a city name.";
       break;
+    case "OFFLINE":
+      title = "You Are Offline";
+      message = "You are currently offline. Live weather information requires an internet connection.";
+      break;
     case "CITY_NOT_FOUND":
       title = "City Not Found";
       message = "City not found. Please check the spelling and try again.";
@@ -413,14 +445,20 @@ async function handleSearch(cityName) {
   } catch (error) {
     console.error("Weather query failed:", error);
 
-    if (error.message === "CITY_NOT_FOUND") {
+    if (error.message === "OFFLINE") {
+      showError("OFFLINE");
+    } else if (error.message === "CITY_NOT_FOUND") {
       showError("CITY_NOT_FOUND");
     } else if (error.message === "EMPTY_INPUT") {
       showError("EMPTY_INPUT");
     } else if (error.message === "RATE_LIMIT_EXCEEDED") {
       showError("RATE_LIMIT_EXCEEDED");
     } else if (error instanceof TypeError && error.message.includes("fetch")) {
-      showError("NETWORK_ERROR");
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        showError("OFFLINE");
+      } else {
+        showError("NETWORK_ERROR");
+      }
     } else {
       showError("SERVER_ERROR", error.message || "Unable to retrieve weather information. Please try again.");
     }
@@ -516,4 +554,74 @@ if (teamModal) {
     }
   });
 }
+
+// ============================================================================
+// 9. PROGRESSIVE WEB APP (PWA) SERVICE WORKER REGISTRATION
+// ============================================================================
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/service-worker.js")
+      .then((registration) => {
+        console.log("[PWA] Service Worker registered successfully with scope:", registration.scope);
+      })
+      .catch((error) => {
+        console.error("[PWA] Service Worker registration failed:", error);
+      });
+  });
+}
+
+// ============================================================================
+// 10. REAL-TIME OFFLINE / ONLINE CONNECTIVITY CONTROLLER
+// ============================================================================
+const offlineBanner = document.getElementById("offlineBanner");
+
+function handleOnlineStatusChange() {
+  if (!navigator.onLine) {
+    if (offlineBanner) {
+      offlineBanner.classList.remove("online-recovered");
+      offlineBanner.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+          <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <line x1="12" y1="20" x2="12.01" y2="20"></line>
+        </svg>
+        <span>You are currently offline. Live weather information requires an internet connection.</span>
+      `;
+      offlineBanner.style.display = "flex";
+    }
+  } else {
+    if (offlineBanner && offlineBanner.style.display !== "none") {
+      offlineBanner.classList.add("online-recovered");
+      offlineBanner.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <line x1="12" y1="20" x2="12.01" y2="20"></line>
+        </svg>
+        <span>Back online. Live weather functionality resumed.</span>
+      `;
+      setTimeout(() => {
+        if (navigator.onLine && offlineBanner) {
+          offlineBanner.style.display = "none";
+          offlineBanner.classList.remove("online-recovered");
+        }
+      }, 3500);
+    }
+  }
+}
+
+window.addEventListener("online", handleOnlineStatusChange);
+window.addEventListener("offline", handleOnlineStatusChange);
+
+// Initial check on load
+if (typeof navigator !== "undefined" && !navigator.onLine) {
+  handleOnlineStatusChange();
+}
+
 

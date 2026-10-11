@@ -71,8 +71,14 @@ To ensure professional software engineering security standards, the frontend app
   - Aggregates daily forecasts for the next 5 days.
   - Displays day of the week, formatted date, condition icon, and text.
   - Highlights upcoming **High (Warm Red)** and **Low (Cool Blue)** temperatures in °C.
+- **Progressive Web App (PWA) Capabilities:**
+  - Fully installable on Android, iOS, Windows, macOS, and Linux.
+  - Complete Web App Manifest (`manifest.webmanifest`) with standalone display mode.
+  - Custom high-resolution PWA icons (192x192, 512x512, maskable, and Apple touch icon).
+  - Background Service Worker (`service-worker.js`) with versioned application shell caching.
+  - Graceful offline experience: offline banner notification, friendly prompt if weather is requested without internet, and zero fabrication of outdated or mock data.
 - **Active Loading State:** Visual spinner and `"Loading weather data..."` indicator with search button disabled during in-flight network requests.
-- **Defensive Error Handling:** Polite, user-friendly feedback for empty submissions, invalid city names (404), unauthorized API keys (401), rate limits (429), and network drops.
+- **Defensive Error Handling:** Polite, user-friendly feedback for empty submissions, invalid city names (404), unauthorized API keys (401), rate limits (429), and offline state.
 - **Search History for Session:** Displays recent queries conducted during the current browser session for rapid re-querying.
 - **Fully Responsive Design:** Fluid grid and flexbox layout optimized across mobile phones, tablets, laptops, and wide desktop screens without horizontal scroll.
 
@@ -82,6 +88,7 @@ To ensure professional software engineering security standards, the frontend app
 - **Frontend Presentation:** HTML5 (Semantic elements, accessible ARIA attributes)
 - **Styling:** CSS3 (Custom properties/variables, Flexbox, CSS Grid, media queries, smooth animations)
 - **Frontend Logic:** Vanilla JavaScript (ES6+ `async/await`, `fetch()`, DOM Manipulation)
+- **PWA Toolchain:** Web App Manifest (`manifest.webmanifest`), Service Worker API (`service-worker.js`), Cache API
 - **Serverless Backend:** Node.js Vercel Serverless Function (`/api/weather.js`)
 - **External Public API:** [OpenWeather Current Weather Data API](https://openweathermap.org/current)
 - **Cloud Hosting & Deployment:** Vercel

@@ -98,12 +98,18 @@ This mini-project addresses these challenges by:
 4. **5-Day Weather Forecast Section:** Displays upcoming daily forecasts with calculated high and low temperatures, condition descriptions, and official weather icons.
 5. **Session Query History:** Dynamic breadcrumb chips of cities searched during the current browser session.
 6. **Resilient Feedback System:** Distinct visual states for idle, loading, success, and error outcomes.
-7. **Decoupled Architecture:** Clean separation of concerns between presentation, client networking, serverless proxy, and upstream provider.
+7. **Progressive Web App (PWA) Support:**
+   - Web App Manifest (`manifest.webmanifest`) enabling home screen installation and standalone app display.
+   - High-resolution adaptive and maskable icons (192x192, 512x512) and Apple touch icons.
+   - Offline Application Shell caching through Service Worker (`service-worker.js`).
+   - Conservative caching policy: Live weather queries are NEVER permanently cached or fabricated. An informative offline notification informs users that live weather data requires internet connectivity, resuming seamlessly once connected.
+8. **Decoupled Architecture:** Clean separation of concerns between presentation, client networking, serverless proxy, and upstream provider.
 
 ### Technology Stack
 - **Markup:** HTML5 (Semantic document outline, accessible labels, ARIA landmarks)
 - **Presentation:** CSS3 (Custom CSS properties, CSS Grid, Flexbox, media query breakpoints)
 - **Scripting:** Vanilla JavaScript (ES6+ `async/await`, `fetch()` API, DOM Manipulation)
+- **PWA & Offline Standards:** Web App Manifest (`manifest.webmanifest`), Service Worker API (`service-worker.js`), Cache API
 - **Serverless Execution:** Node.js Vercel Serverless Function (`/api/weather.js`)
 - **External Public API:** OpenWeather Current Weather Data API (HTTP RESTful JSON endpoint)
 - **Cloud Platform:** Vercel

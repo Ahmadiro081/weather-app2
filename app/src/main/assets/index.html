@@ -4,11 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weather App | Undergraduate Mini-Project</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="theme-color" content="#0284c7">
+  <meta name="description" content="GET 411 Artificial Intelligence Mini Project - Weather App Using Public API. Federal University Dutsin-Ma (FUDMA) Group 14.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Weather App">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/svg+xml" href="assets/images/weather-logo.svg">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="app-container">
+    
+    <!-- Offline Status Banner -->
+    <div id="offlineBanner" class="offline-banner" role="status" aria-live="polite" style="display: none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+      </svg>
+      <span>You are currently offline. Live weather information requires an internet connection.</span>
+    </div>
     
     <!-- Top Header Navigation -->
     <header class="header">
