@@ -450,5 +450,70 @@ quickCityButtons.forEach((btn) => {
 
 // Initial boot: focus input
 document.addEventListener("DOMContentLoaded", () => {
-  cityInput.focus();
+  if (cityInput) {
+    cityInput.focus();
+  }
 });
+
+// ============================================================================
+// 8. PROJECT TEAM MODAL CONTROLLER (GET 411 • GROUP 14)
+// ============================================================================
+
+const openTeamModalBtn = document.getElementById("openTeamModalBtn");
+const heroTeamBtn = document.getElementById("heroTeamBtn");
+const openModalFromSectionBtn = document.getElementById("openModalFromSectionBtn");
+const closeTeamModalBtn = document.getElementById("closeTeamModalBtn");
+const teamModal = document.getElementById("teamModal");
+
+/**
+ * Open the Project Team dialog
+ */
+function openTeamModal() {
+  if (teamModal) {
+    teamModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+}
+
+/**
+ * Close the Project Team dialog
+ */
+function closeTeamModal() {
+  if (teamModal) {
+    teamModal.style.display = "none";
+    document.body.style.overflow = "";
+  }
+}
+
+if (openTeamModalBtn) {
+  openTeamModalBtn.addEventListener("click", openTeamModal);
+}
+
+if (heroTeamBtn) {
+  heroTeamBtn.addEventListener("click", openTeamModal);
+}
+
+if (openModalFromSectionBtn) {
+  openModalFromSectionBtn.addEventListener("click", openTeamModal);
+}
+
+if (closeTeamModalBtn) {
+  closeTeamModalBtn.addEventListener("click", closeTeamModal);
+}
+
+if (teamModal) {
+  // Click on background backdrop to close
+  teamModal.addEventListener("click", (e) => {
+    if (e.target === teamModal) {
+      closeTeamModal();
+    }
+  });
+
+  // ESC key to dismiss modal
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && teamModal.style.display === "flex") {
+      closeTeamModal();
+    }
+  });
+}
+

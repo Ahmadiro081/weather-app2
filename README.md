@@ -1,9 +1,38 @@
 # WEATHER APP USING PUBLIC API
 
-**Undergraduate Mini-Project**  
-**Course:** Application Development / Web Technologies  
-**Focus Area:** REST API Integration, Asynchronous JavaScript, Serverless Security, and Responsive Web Design  
+**Institution:** Federal University Dutsin-Ma (FUDMA)  
+**Course Code:** GET 411  
+**Project:** Artificial Intelligence Mini Project  
+**Group:** Group 14  
+**Academic Session:** 2026/2027  
+**Lecturer:** Nura Muhammad  
 **Target Deployment Platform:** Vercel (Production Serverless Architecture)
+
+---
+
+## Academic Project Details & Group 14 Members
+
+### Course & Supervision
+- **Institution:** Federal University Dutsin-Ma (FUDMA)
+- **Course Code:** GET 411
+- **Project Title:** Artificial Intelligence Mini Project - Weather App Using Public API
+- **Group:** Group 14
+- **Academic Session:** 2026/2027
+- **Lecturer:** Nura Muhammad
+
+### Group 14 Student Members
+| S/N | Name | Matric Number | Department |
+|:---:|:---|:---|:---|
+| 01 | Adamu Aliyu | ENG/2024/32546 | Mechanical Engineering |
+| 02 | Yakubu Bilyaminu Korau | ENG/2024/33389 | Mechanical Engineering |
+| 03 | Abdulrazak Nura | ENG/2024/32426 | Electrical and Electronics Engineering |
+| 04 | Gideon Ogala | ENG/2024/32926 | Electrical and Electronic Engineering |
+| 05 | Ibrahim Nasir | ENG/2024/36136 | Chemical Engineering |
+| 06 | Dauda Ismail | ENG/2024/32787 | Civil Engineering |
+| 07 | Sulaiman Rabiu Gideh | ENG/2024/34260 | Civil Engineering |
+| 08 | Benson Oshuo Echuo-Odu | ENG/2024/32156 | Mechatronics Engineering |
+| 09 | Aliyu Abubakar | ENG/2025/36887 | Civil Engineering |
+| 10 | Favour Hephzibah Emmanuel | AGR/2024/32419 | Agricultural and Bio-Environmental Engineering |
 
 ---
 
