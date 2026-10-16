@@ -164,7 +164,24 @@
             <span id="countryName" class="country-name">, Nigeria</span>
             <span id="weatherDate" class="weather-date">Current Weather</span>
           </div>
-          <span class="weather-badge">Real-time</span>
+          <div class="weather-header-actions">
+            <!-- Temperature Unit Toggle Switch (°C / °F) -->
+            <div class="unit-toggle-wrapper" title="Switch temperature unit between Celsius (°C) and Fahrenheit (°F)">
+              <button 
+                type="button" 
+                id="unitToggleBtn" 
+                class="unit-toggle-switch" 
+                role="switch" 
+                aria-checked="false" 
+                aria-label="Toggle temperature unit between Celsius and Fahrenheit"
+              >
+                <span class="unit-toggle-option active" id="unitOptC">°C</span>
+                <span class="unit-toggle-slider" aria-hidden="true"></span>
+                <span class="unit-toggle-option" id="unitOptF">°F</span>
+              </button>
+            </div>
+            <span class="weather-badge">Real-time</span>
+          </div>
         </div>
 
         <!-- Primary Weather Stats: Temperature & Icon -->
@@ -172,7 +189,7 @@
           <div class="temperature-group">
             <div class="temp-row">
               <span id="currentTemp" class="current-temp">28</span>
-              <span class="temp-unit">°C</span>
+              <span id="tempUnit" class="temp-unit">°C</span>
             </div>
             <span id="feelsLike" class="feels-like-text">Feels Like: 31°C</span>
           </div>

@@ -58,7 +58,7 @@ This mini-project addresses these challenges by:
 ### Functional Objectives:
 - To develop an intuitive, responsive user interface allowing users to look up weather conditions for any worldwide city.
 - To provide dedicated quick-selection capabilities for major Nigerian metropolitan hubs, specifically Abuja (the Federal Capital Territory) and Lagos (the commercial center).
-- To retrieve and display accurate real-time metrics including temperature in Celsius (°C), feels-like temperature, humidity, wind velocity, atmospheric pressure, and visibility.
+- To retrieve and display accurate real-time metrics including temperature in Celsius (°C) and Fahrenheit (°F) via an interactive unit toggle switch, feels-like temperature, humidity, wind velocity, atmospheric pressure, and visibility.
 - To implement defensive input validation and informative, user-friendly error alerts for edge cases.
 
 ### Security & Architectural Objectives:

@@ -58,8 +58,8 @@ To ensure professional software engineering security standards, the frontend app
   - Sanitizes and formats the response JSON before returning it to the frontend.
 - **Comprehensive Meteorological Data Display:**
   - City name and Country identifier
-  - Current temperature in degrees Celsius (°C)
-  - Perceived ("Feels Like") temperature in °C
+  - Interactive temperature unit toggle switch allowing seamless switching between **Celsius (°C)** and **Fahrenheit (°F)** for all displayed temperatures (persisted across sessions)
+  - Current temperature and perceived ("Feels Like") temperature in active unit (°C / °F)
   - Primary weather condition (e.g., Clear, Clouds, Rain, Thunderstorm)
   - Detailed weather description (e.g., "scattered clouds")
   - Official OpenWeather weather condition icon

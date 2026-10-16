@@ -37,6 +37,22 @@ const countryNames = {
   CA: "Canada"
 };
 
+// Active temperature unit: 'C' (Celsius) or 'F' (Fahrenheit)
+let currentUnit = "C";
+
+// Persistent preference recovery (if available in browser localStorage)
+try {
+  const savedUnit = localStorage.getItem("fudma_weather_unit");
+  if (savedUnit === "F" || savedUnit === "C") {
+    currentUnit = savedUnit;
+  }
+} catch (e) {
+  // Graceful fallback for environments with restricted storage
+}
+
+// Cached latest weather response to enable instantaneous client-side unit toggling
+let lastWeatherData = null;
+
 // ============================================================================
 // 2. DOM ELEMENT REFERENCES
 // ============================================================================
@@ -53,6 +69,12 @@ const alertMessage = document.getElementById("alertMessage");
 
 const weatherCard = document.getElementById("weatherCard");
 const initialPlaceholder = document.getElementById("initialPlaceholder");
+
+// Temperature unit toggle switch elements
+const unitToggleBtn = document.getElementById("unitToggleBtn");
+const unitOptC = document.getElementById("unitOptC");
+const unitOptF = document.getElementById("unitOptF");
+const tempUnitElem = document.getElementById("tempUnit");
 
 const cityNameElem = document.getElementById("cityName");
 const countryNameElem = document.getElementById("countryName");
@@ -140,6 +162,144 @@ async function fetchWeatherData(cityName) {
 // ============================================================================
 
 /**
+ * Converts a temperature value from Celsius to the active unit (°C or °F).
+ * 
+ * @param {number|string} celsiusVal - Temperature in Celsius
+ * @param {string} unit - Target unit ('C' or 'F')
+ * @returns {number|string} - Converted integer value or fallback string
+ */
+function convertTemperature(celsiusVal, unit = currentUnit) {
+  if (typeof celsiusVal !== "number" || isNaN(celsiusVal)) {
+    const parsed = parseFloat(celsiusVal);
+    if (!isNaN(parsed)) {
+      celsiusVal = parsed;
+    } else {
+      return "--";
+    }
+  }
+
+  if (unit === "F") {
+    return Math.round((celsiusVal * 9) / 5 + 32);
+  }
+  return Math.round(celsiusVal);
+}
+
+/**
+ * Updates all displayed temperature values across the UI to match currentUnit.
+ * Modifies:
+ * - Current temperature value (#currentTemp)
+ * - Temperature unit indicator (#tempUnit)
+ * - Feels-like temperature text (#feelsLike)
+ * - 5-Day forecast cards (#forecastGrid)
+ * - Toggle switch slider position and ARIA state
+ */
+function updateTemperatureDisplays() {
+  const isFahrenheit = currentUnit === "F";
+  const unitSymbol = isFahrenheit ? "°F" : "°C";
+
+  // 1. Update toggle switch ARIA attributes and option states
+  if (unitToggleBtn) {
+    unitToggleBtn.setAttribute("aria-checked", isFahrenheit ? "true" : "false");
+    unitToggleBtn.setAttribute(
+      "aria-label",
+      `Temperature unit is ${isFahrenheit ? "Fahrenheit" : "Celsius"}. Click to switch to ${isFahrenheit ? "Celsius" : "Fahrenheit"}.`
+    );
+  }
+
+  if (unitOptC && unitOptF) {
+    if (isFahrenheit) {
+      unitOptC.classList.remove("active");
+      unitOptF.classList.add("active");
+    } else {
+      unitOptC.classList.add("active");
+      unitOptF.classList.remove("active");
+    }
+  }
+
+  // 2. Update CSS helper classes for forecast pseudo-elements
+  if (weatherCard) {
+    if (isFahrenheit) {
+      weatherCard.classList.add("unit-f");
+    } else {
+      weatherCard.classList.remove("unit-f");
+    }
+  }
+  if (forecastSection) {
+    if (isFahrenheit) {
+      forecastSection.classList.add("unit-f");
+    } else {
+      forecastSection.classList.remove("unit-f");
+    }
+  }
+
+  // 3. Update main unit indicator
+  if (tempUnitElem) {
+    tempUnitElem.textContent = unitSymbol;
+  }
+
+  // 4. Update current temp and feels-like temp
+  if (lastWeatherData && lastWeatherData.main) {
+    const rawTemp = lastWeatherData.main.temp;
+    const rawFeelsLike = lastWeatherData.main.feels_like;
+
+    if (currentTempElem) {
+      const displayTemp = convertTemperature(rawTemp);
+      currentTempElem.textContent = `${displayTemp}`;
+
+      // Subtle pulse animation on unit switch
+      currentTempElem.classList.remove("animate-update");
+      void currentTempElem.offsetWidth;
+      currentTempElem.classList.add("animate-update");
+    }
+
+    if (feelsLikeElem) {
+      const displayFeelsLike = convertTemperature(rawFeelsLike);
+      feelsLikeElem.textContent = `Feels Like: ${displayFeelsLike}${unitSymbol}`;
+    }
+
+    // 5. Update forecast cards
+    if (Array.isArray(lastWeatherData.forecast) && lastWeatherData.forecast.length > 0) {
+      renderForecast(lastWeatherData.forecast);
+    }
+  } else {
+    // If user flips toggle prior to first fetch, keep initial demo values in sync
+    if (currentTempElem) {
+      const defaultCelsius = 28;
+      currentTempElem.textContent = `${convertTemperature(defaultCelsius)}`;
+    }
+    if (feelsLikeElem) {
+      const defaultFeelsLikeCelsius = 31;
+      feelsLikeElem.textContent = `Feels Like: ${convertTemperature(defaultFeelsLikeCelsius)}${unitSymbol}`;
+    }
+  }
+}
+
+/**
+ * Sets the active temperature unit to 'C' or 'F' and updates the UI.
+ * 
+ * @param {string} unit - 'C' or 'F'
+ */
+function setTemperatureUnit(unit) {
+  if (unit !== "C" && unit !== "F") return;
+  if (currentUnit === unit) return;
+  currentUnit = unit;
+  try {
+    localStorage.setItem("fudma_weather_unit", currentUnit);
+  } catch (e) {
+    // Graceful fallback for restricted storage
+  }
+  updateTemperatureDisplays();
+}
+
+/**
+ * Toggles the temperature unit between Celsius and Fahrenheit.
+ */
+function toggleTemperatureUnit() {
+  const nextUnit = currentUnit === "C" ? "F" : "C";
+  setTemperatureUnit(nextUnit);
+}
+
+/**
  * Renders the fetched weather data into the UI components.
  * 
  * @param {Object} data - Clean JSON object from serverless API
@@ -148,14 +308,20 @@ function renderWeatherData(data) {
   hideLoadingState();
   hideError();
 
+  // Cache latest dataset for instant client-side unit toggling
+  lastWeatherData = data;
+
   // Extract core fields from JSON payload
   const city = data.name;
   const countryCode = data.sys && data.sys.country ? data.sys.country : "";
   const countryDisplayName = countryNames[countryCode] || countryCode || "";
 
-  // Temperatures in Celsius (rounded to nearest integer)
-  const temp = typeof data.main?.temp === "number" ? Math.round(data.main.temp) : "--";
-  const feelsLike = typeof data.main?.feels_like === "number" ? Math.round(data.main.feels_like) : "--";
+  const isFahrenheit = currentUnit === "F";
+  const unitSymbol = isFahrenheit ? "°F" : "°C";
+
+  // Temperatures converted based on active unit
+  const temp = typeof data.main?.temp === "number" ? convertTemperature(data.main.temp) : "--";
+  const feelsLike = typeof data.main?.feels_like === "number" ? convertTemperature(data.main.feels_like) : "--";
 
   // Weather description & conditions
   const weatherObj = data.weather && data.weather.length > 0 ? data.weather[0] : null;
@@ -186,9 +352,31 @@ function renderWeatherData(data) {
   });
 
   currentTempElem.textContent = `${temp}`;
-  feelsLikeElem.textContent = `Feels Like: ${feelsLike}°C`;
+  if (tempUnitElem) tempUnitElem.textContent = unitSymbol;
+  feelsLikeElem.textContent = `Feels Like: ${feelsLike}${unitSymbol}`;
   weatherConditionElem.textContent = condition;
   weatherDescriptionElem.textContent = description;
+
+  // Ensure switch visual and accessibility attributes match currentUnit
+  if (unitToggleBtn) {
+    unitToggleBtn.setAttribute("aria-checked", isFahrenheit ? "true" : "false");
+  }
+  if (unitOptC && unitOptF) {
+    if (isFahrenheit) {
+      unitOptC.classList.remove("active");
+      unitOptF.classList.add("active");
+    } else {
+      unitOptC.classList.add("active");
+      unitOptF.classList.remove("active");
+    }
+  }
+  if (weatherCard) {
+    if (isFahrenheit) {
+      weatherCard.classList.add("unit-f");
+    } else {
+      weatherCard.classList.remove("unit-f");
+    }
+  }
 
   // Use official OpenWeather icon asset (2x resolution)
   weatherIconElem.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
@@ -252,6 +440,15 @@ function renderForecast(forecastList) {
     return;
   }
 
+  const isFahrenheit = currentUnit === "F";
+  const unitSymbol = isFahrenheit ? "°F" : "°C";
+
+  if (isFahrenheit) {
+    forecastSection.classList.add("unit-f");
+  } else {
+    forecastSection.classList.remove("unit-f");
+  }
+
   forecastGrid.innerHTML = "";
 
   forecastList.forEach(day => {
@@ -261,6 +458,8 @@ function renderForecast(forecastList) {
     const conditionText = day.condition || "Clear";
     const descText = day.description || conditionText;
     const iconCode = day.icon || "01d";
+    const displayMax = typeof day.tempMax === "number" ? convertTemperature(day.tempMax) : day.tempMax;
+    const displayMin = typeof day.tempMin === "number" ? convertTemperature(day.tempMin) : day.tempMin;
 
     card.innerHTML = `
       <div class="forecast-day-wrap">
@@ -271,10 +470,10 @@ function renderForecast(forecastList) {
         <img class="forecast-icon-img" src="https://openweathermap.org/img/wn/${iconCode}@2x.png" alt="${descText}">
         <span class="forecast-condition" title="${descText}">${conditionText}</span>
       </div>
-      <div class="forecast-temp-range" title="Upcoming High: ${day.tempMax}°C | Low: ${day.tempMin}°C">
-        <span class="temp-high" title="Upcoming High">${day.tempMax}</span>
+      <div class="forecast-temp-range" title="Upcoming High: ${displayMax}${unitSymbol} | Low: ${displayMin}${unitSymbol}">
+        <span class="temp-high" title="Upcoming High">${displayMax}</span>
         <span class="temp-separator">/</span>
-        <span class="temp-low" title="Upcoming Low">${day.tempMin}</span>
+        <span class="temp-low" title="Upcoming Low">${displayMin}</span>
       </div>
     `;
 
@@ -492,11 +691,39 @@ quickCityButtons.forEach((btn) => {
   });
 });
 
-// Initial boot: focus input
+// Temperature Unit Toggle Switch (°C / °F)
+if (unitToggleBtn) {
+  unitToggleBtn.addEventListener("click", (e) => {
+    // If user clicked directly on one of the unit options, set that specific unit
+    if (e.target === unitOptC) {
+      setTemperatureUnit("C");
+    } else if (e.target === unitOptF) {
+      setTemperatureUnit("F");
+    } else {
+      toggleTemperatureUnit();
+    }
+  });
+
+  unitToggleBtn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggleTemperatureUnit();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      setTemperatureUnit("C");
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      setTemperatureUnit("F");
+    }
+  });
+}
+
+// Initial boot: focus input and synchronize temperature unit display
 document.addEventListener("DOMContentLoaded", () => {
   if (cityInput) {
     cityInput.focus();
   }
+  updateTemperatureDisplays();
 });
 
 // ============================================================================
