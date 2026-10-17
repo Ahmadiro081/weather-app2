@@ -70,6 +70,13 @@ const alertMessage = document.getElementById("alertMessage");
 const weatherCard = document.getElementById("weatherCard");
 const initialPlaceholder = document.getElementById("initialPlaceholder");
 
+// Severe weather alert banner elements
+const severeAlertBanner = document.getElementById("severeAlertBanner");
+const severeAlertSender = document.getElementById("severeAlertSender");
+const severeAlertEvent = document.getElementById("severeAlertEvent");
+const severeAlertDesc = document.getElementById("severeAlertDesc");
+const dismissSevereAlertBtn = document.getElementById("dismissSevereAlertBtn");
+
 // Temperature unit toggle switch elements
 const unitToggleBtn = document.getElementById("unitToggleBtn");
 const unitOptC = document.getElementById("unitOptC");
@@ -458,6 +465,9 @@ function renderWeatherData(data) {
   // Render 5-day weather forecast with upcoming high and low temperatures
   renderForecast(data.forecast);
 
+  // Check and display severe weather alert banner if any active advisories
+  renderSevereAlerts(data.alerts);
+
   // Add to session search history
   addToSessionHistory(city);
 }
@@ -521,11 +531,46 @@ function renderForecast(forecastList) {
 }
 
 /**
+ * Renders or hides severe weather alerts banner based on API alerts.
+ * 
+ * @param {Array} alerts - Array of alert objects from OpenWeather
+ */
+function renderSevereAlerts(alerts) {
+  if (!severeAlertBanner) return;
+
+  if (Array.isArray(alerts) && alerts.length > 0) {
+    const alertData = alerts[0]; // Primary active advisory
+    if (severeAlertSender) {
+      severeAlertSender.textContent = alertData.sender || "Official Meteorological Service";
+    }
+    if (severeAlertEvent) {
+      severeAlertEvent.textContent = alertData.event || "Severe Weather Advisory";
+    }
+    if (severeAlertDesc) {
+      severeAlertDesc.textContent = alertData.description || "Severe meteorological conditions reported for this region. Please take appropriate safety precautions.";
+    }
+    severeAlertBanner.style.display = "flex";
+  } else {
+    severeAlertBanner.style.display = "none";
+  }
+}
+
+/**
+ * Dismisses or hides the severe weather alert banner.
+ */
+function hideSevereAlert() {
+  if (severeAlertBanner) {
+    severeAlertBanner.style.display = "none";
+  }
+}
+
+/**
  * Activates loading state: shows spinner and disables search buttons.
  */
 function showLoadingState() {
   isLoading = true;
   hideError();
+  hideSevereAlert();
   loadingState.classList.add("active");
   searchButton.disabled = true;
   searchButton.innerHTML = `
@@ -558,6 +603,7 @@ function hideLoadingState() {
  */
 function showError(type, customMsg = "") {
   hideLoadingState();
+  hideSevereAlert();
   if (forecastSection) {
     forecastSection.style.display = "none";
     forecastSection.classList.remove("active");
@@ -751,6 +797,13 @@ if (unitToggleBtn) {
       e.preventDefault();
       setTemperatureUnit("F");
     }
+  });
+}
+
+// Severe weather alert banner dismissal
+if (dismissSevereAlertBtn) {
+  dismissSevereAlertBtn.addEventListener("click", () => {
+    hideSevereAlert();
   });
 }
 

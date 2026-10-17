@@ -142,39 +142,60 @@ module.exports = async function handler(req, res) {
       forecast = processForecastData(forecastData.list, forecastData.city?.timezone || 0);
     }
 
-    // Fetch UV Index from OpenWeather API using coordinates
+    // Fetch UV Index and Severe Weather Alerts from OpenWeather API
     let uvi = typeof currentData.uvi === "number" ? currentData.uvi : null;
+    let alerts = [];
 
-    if (uvi === null && currentData.coord && typeof currentData.coord.lat === "number" && typeof currentData.coord.lon === "number") {
+    if (currentData.coord && typeof currentData.coord.lat === "number" && typeof currentData.coord.lon === "number") {
       const lat = currentData.coord.lat;
       const lon = currentData.coord.lon;
 
+      // 1. Query OpenWeather One Call API (supports severe weather alerts & UV index)
       try {
-        // 1. Query official OpenWeather UV Index API endpoint
-        const uviUrl = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey.trim()}`;
-        const uviRes = await fetch(uviUrl).catch(() => null);
+        const oneCallUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,daily&appid=${apiKey.trim()}`;
+        const oneCallRes = await fetch(oneCallUrl).catch(() => null);
 
-        if (uviRes && uviRes.ok) {
-          const uviData = await uviRes.json().catch(() => null);
-          if (uviData && typeof uviData.value === "number") {
-            uvi = uviData.value;
-          }
-        } else {
-          // 2. Fallback: Query OpenWeather One Call API
-          const oneCallUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,daily,alerts&appid=${apiKey.trim()}`;
-          const oneCallRes = await fetch(oneCallUrl).catch(() => null);
-          if (oneCallRes && oneCallRes.ok) {
-            const oneCallData = await oneCallRes.json().catch(() => null);
-            if (oneCallData && typeof oneCallData.current?.uvi === "number") {
+        if (oneCallRes && oneCallRes.ok) {
+          const oneCallData = await oneCallRes.json().catch(() => null);
+          if (oneCallData) {
+            // Extract UV index if available
+            if (typeof oneCallData.current?.uvi === "number") {
               uvi = oneCallData.current.uvi;
+            }
+
+            // Extract official severe weather alerts
+            if (Array.isArray(oneCallData.alerts) && oneCallData.alerts.length > 0) {
+              alerts = oneCallData.alerts.map(a => ({
+                event: a.event || "Severe Weather Advisory",
+                sender: a.sender_name || "Official Meteorological Service",
+                start: a.start || null,
+                end: a.end || null,
+                description: a.description || "Severe weather conditions reported for this region. Please take appropriate safety precautions."
+              }));
             }
           }
         }
-      } catch (uvErr) {
-        console.warn("UV index fetch error:", uvErr);
+      } catch (oneCallErr) {
+        console.warn("OneCall alert fetch error:", oneCallErr);
       }
 
-      // 3. Fallback calculation if OpenWeather account tier restricts separate UV endpoints
+      // 2. Query dedicated OpenWeather UV endpoint if UVI is still null
+      if (uvi === null) {
+        try {
+          const uviUrl = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey.trim()}`;
+          const uviRes = await fetch(uviUrl).catch(() => null);
+          if (uviRes && uviRes.ok) {
+            const uviData = await uviRes.json().catch(() => null);
+            if (uviData && typeof uviData.value === "number") {
+              uvi = uviData.value;
+            }
+          }
+        } catch (uvErr) {
+          console.warn("UV endpoint fetch error:", uvErr);
+        }
+      }
+
+      // 3. Fallback solar zenith UV calculation if restricted by account tier
       if (uvi === null) {
         const dt = currentData.dt || Math.floor(Date.now() / 1000);
         const sunrise = currentData.sys?.sunrise;
@@ -196,7 +217,72 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // 6. Return sanitized current weather + UV index + 5-day forecast
+    // 4. Inspect OpenWeather current condition codes and wind speeds for severe weather alerts if none returned by onecall
+    if (alerts.length === 0 && currentData.weather && currentData.weather.length > 0) {
+      const weatherId = currentData.weather[0].id;
+      const weatherDesc = currentData.weather[0].description || "";
+      const windSpeed = currentData.wind?.speed || 0;
+      const temp = currentData.main?.temp;
+      const feelsLike = currentData.main?.feels_like;
+
+      if (weatherId === 781) {
+        alerts.push({
+          event: "Tornado Warning",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: "Active tornado conditions reported in the municipality. Seek sturdy shelter immediately."
+        });
+      } else if (weatherId === 771) {
+        alerts.push({
+          event: "Squall Advisory",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: "Violent wind squalls and turbulent meteorological activity detected in the area."
+        });
+      } else if (weatherId === 762) {
+        alerts.push({
+          event: "Volcanic Ash Warning",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: "Airborne volcanic ash detected in the atmospheric column. Protect respiratory passages."
+        });
+      } else if (weatherId === 751 || weatherId === 761 || weatherId === 731) {
+        alerts.push({
+          event: "Dust / Sandstorm Advisory",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: "High-density airborne sand or dust suspension causing hazardous surface visibility and air quality impairment."
+        });
+      } else if (weatherId === 212) {
+        alerts.push({
+          event: "Severe Thunderstorm Warning",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: `Intense electrical activity and heavy convective thunderstorm observed (${weatherDesc}). Exercise caution.`
+        });
+      } else if (weatherId === 504) {
+        alerts.push({
+          event: "Extreme Rainfall Warning",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: "Torrential precipitation active. High localized flash flood and drainage overload danger."
+        });
+      } else if (weatherId === 511) {
+        alerts.push({
+          event: "Freezing Rain Advisory",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: "Freezing precipitation active. Rapid ice glaze accumulation on roadways and exposed surfaces."
+        });
+      } else if (windSpeed >= 20.8) {
+        alerts.push({
+          event: "Storm-Force Wind Advisory",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: `Gale-force to storm-force winds detected (${windSpeed.toFixed(1)} m/s). Secure loose objects and avoid exposed areas.`
+        });
+      } else if (typeof temp === "number" && (temp >= 42 || (typeof feelsLike === "number" && feelsLike >= 45))) {
+        alerts.push({
+          event: "Excessive Heat Warning",
+          sender: "OpenWeather Meteorological Alert Service",
+          description: `Dangerous ambient thermal levels (${Math.round(temp)}°C, feels like ${Math.round(feelsLike)}°C). Limit prolonged outdoor exertion.`
+        });
+      }
+    }
+
+    // 6. Return sanitized current weather + UV index + severe alerts + 5-day forecast
     res.status(200).json({
       name: currentData.name,
       sys: {
@@ -219,6 +305,7 @@ module.exports = async function handler(req, res) {
       },
       visibility: currentData.visibility,
       uvi: typeof uvi === "number" ? Math.round(uvi * 10) / 10 : null,
+      alerts: alerts,
       forecast: forecast
     });
   } catch (error) {

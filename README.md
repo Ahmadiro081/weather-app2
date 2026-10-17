@@ -69,6 +69,10 @@ To ensure professional software engineering security standards, the frontend app
   - Atmospheric pressure in hectopascals (hPa)
   - Visibility distance in kilometers (km)
   - Real-time **UV Index** with World Health Organization (WHO) risk level indicator (Low, Moderate, High, Very High, Extreme) powered by the OpenWeather API
+- **Severe Weather Alert Banner Notification:**
+  - Automatically queries official meteorological alerts from the OpenWeather API (One Call & active severe weather classification system) for the searched municipality.
+  - Displays a high-visibility, accessible banner notification with pulsing warning icon, issuing organization, alert event title, and description.
+  - Allows immediate one-click dismissal.
 - **5-Day Weather Forecast UI Section:**
   - Aggregates daily forecasts for the next 5 days.
   - Displays day of the week, formatted date, condition icon, and text.

@@ -59,7 +59,8 @@ This mini-project addresses these challenges by:
 ### Functional Objectives:
 - To develop an intuitive, responsive user interface allowing users to look up weather conditions for any worldwide city.
 - To provide dedicated quick-selection capabilities for major Nigerian metropolitan hubs, specifically Abuja (the Federal Capital Territory) and Lagos (the commercial center).
-- To retrieve and display accurate real-time metrics including temperature in Celsius (°C) and Fahrenheit (°F) via an interactive unit toggle switch, feels-like temperature, humidity, wind velocity, atmospheric pressure, and visibility.
+- To retrieve and display accurate real-time metrics including temperature in Celsius (°C) and Fahrenheit (°F) via an interactive unit toggle switch, feels-like temperature, humidity, wind velocity, atmospheric pressure, visibility, and UV index with risk categorization.
+- To detect and display severe weather alerts and meteorological advisories from the OpenWeather API for active searched cities via a dismissible notification banner.
 - To implement defensive input validation and informative, user-friendly error alerts for edge cases.
 
 ### Security & Architectural Objectives:
@@ -76,9 +77,9 @@ This mini-project addresses these challenges by:
 - **Core Technology:** Implementation strictly in standard HTML5, CSS3, Vanilla JavaScript (ES6+), and Node.js Serverless Functions on Vercel.
 - **Serverless API Proxy:** Server-side route `/api/weather` that reads `process.env.OPENWEATHER_API_KEY` and calls OpenWeather with metric units.
 - **Target Geographic Focus:** Pre-configured quick-selection buttons for Nigerian cities (Abuja, Lagos, Kano, Ibadan, Port Harcourt) with arbitrary city search capabilities worldwide.
-- **Data Integration:** Live communication with the OpenWeather Current Weather REST API (`/data/2.5/weather`) via the serverless proxy.
-- **Data Fields Rendered:** City name, country identifier, current temperature (°C/°F), feels-like temperature (°C/°F), weather condition, descriptive text, official OpenWeather condition icon, humidity (%), wind speed (m/s), atmospheric pressure (hPa), visibility (km), and real-time UV Index with WHO risk classification.
-- **Interactive State Management:** Dynamic loading spinners, button disabling during in-flight requests, session search history, and contextual error banners.
+- **Data Integration:** Live communication with the OpenWeather Current Weather REST API (`/data/2.5/weather`), UV endpoints, and One Call alert data via the serverless proxy.
+- **Data Fields Rendered:** City name, country identifier, current temperature (°C/°F), feels-like temperature (°C/°F), weather condition, descriptive text, official OpenWeather condition icon, humidity (%), wind speed (m/s), atmospheric pressure (hPa), visibility (km), real-time UV Index with WHO risk classification, and active severe weather alert notifications.
+- **Interactive State Management:** Dynamic loading spinners, button disabling during in-flight requests, session search history, dismissible severe alert banner, and contextual error banners.
 - **Device Support:** Cross-device responsiveness spanning mobile phones, tablets, laptops, and desktop monitors.
 
 ### Out of Scope:
