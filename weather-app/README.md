@@ -31,7 +31,8 @@
 | 06 | Dauda Ismail | ENG/2024/32787 | Civil Engineering |
 | 07 | Sulaiman Rabiu Gideh | ENG/2024/34260 | Civil Engineering |
 | 08 | Benson Oshuo Echuo-Odu | ENG/2024/32156 | Mechatronics Engineering |
-| 09 | Favour Hephzibah Emmanuel | AGR/2024/32419 | Agricultural and Bio-Environmental Engineering |
+| 09 | Aliyu Abubakar | ENG/2025/36887 | Civil Engineering |
+| 10 | Favour Hephzibah Emmanuel | AGR/2024/32419 | Agricultural and Bio-Environmental Engineering |
 
 ---
 

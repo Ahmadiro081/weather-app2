@@ -12,7 +12,7 @@
  * - Friendly offline fallback when network is unavailable.
  */
 
-const CACHE_NAME = 'fudma-weather-shell-v1.0.4';
+const CACHE_NAME = 'fudma-weather-shell-v1.0.5';
 
 // Core static assets required to render the application shell offline
 const STATIC_ASSETS = [
