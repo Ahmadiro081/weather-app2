@@ -387,29 +387,33 @@ function renderWeatherData(data) {
     }
   }
 
-  // Use official OpenWeather icon asset (2x resolution)
-  weatherIconElem.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-  weatherIconElem.alt = description;
+  // Trigger subtle CSS entrance animation (fade-in & gentle scale-up) on weather icon
+  if (weatherIconElem) {
+    const newIconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+    weatherIconElem.alt = description;
+
+    const triggerIconEntrance = () => {
+      weatherIconElem.classList.remove("animate-update");
+      void weatherIconElem.offsetWidth; // Force reflow to re-trigger entrance animation
+      weatherIconElem.classList.add("animate-update");
+    };
+
+    if (weatherIconElem.src !== newIconUrl) {
+      weatherIconElem.classList.remove("animate-update");
+      weatherIconElem.onload = () => {
+        triggerIconEntrance();
+      };
+      weatherIconElem.src = newIconUrl;
+    } else {
+      triggerIconEntrance();
+    }
+  }
 
   // Trigger subtle CSS animation on temperature display
   if (currentTempElem) {
     currentTempElem.classList.remove("animate-update");
     void currentTempElem.offsetWidth; // Force reflow to re-trigger animation
     currentTempElem.classList.add("animate-update");
-  }
-
-  // Trigger subtle CSS animation on weather icon
-  if (weatherIconElem) {
-    weatherIconElem.classList.remove("animate-update");
-    void weatherIconElem.offsetWidth; // Force reflow to re-trigger animation
-    weatherIconElem.classList.add("animate-update");
-
-    // Also smoothly re-trigger once newly fetched icon image finishes loading
-    weatherIconElem.onload = () => {
-      weatherIconElem.classList.remove("animate-update");
-      void weatherIconElem.offsetWidth;
-      weatherIconElem.classList.add("animate-update");
-    };
   }
 
   // Update metrics grid
