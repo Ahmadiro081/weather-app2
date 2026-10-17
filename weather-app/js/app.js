@@ -89,6 +89,8 @@ const humidityValueElem = document.getElementById("humidityValue");
 const windSpeedValueElem = document.getElementById("windSpeedValue");
 const pressureValueElem = document.getElementById("pressureValue");
 const visibilityValueElem = document.getElementById("visibilityValue");
+const uvIndexValueElem = document.getElementById("uvIndexValue");
+const uvIndexRiskElem = document.getElementById("uvIndexRisk");
 
 const historyContainer = document.getElementById("historyContainer");
 const historyChips = document.getElementById("historyChips");
@@ -408,6 +410,40 @@ function renderWeatherData(data) {
   windSpeedValueElem.textContent = `${windSpeed} m/s`;
   pressureValueElem.textContent = `${pressure} hPa`;
   visibilityValueElem.textContent = visibilityDisplay;
+
+  // UV Index metric and risk categorization
+  if (uvIndexValueElem) {
+    if (typeof data.uvi === "number") {
+      const uviVal = Math.round(data.uvi * 10) / 10;
+      uvIndexValueElem.textContent = `${uviVal}`;
+
+      if (uvIndexRiskElem) {
+        let riskLabel = "Low";
+        let riskClass = "uv-low";
+        if (uviVal >= 11) {
+          riskLabel = "Extreme";
+          riskClass = "uv-extreme";
+        } else if (uviVal >= 8) {
+          riskLabel = "Very High";
+          riskClass = "uv-very-high";
+        } else if (uviVal >= 6) {
+          riskLabel = "High";
+          riskClass = "uv-high";
+        } else if (uviVal >= 3) {
+          riskLabel = "Moderate";
+          riskClass = "uv-moderate";
+        }
+        uvIndexRiskElem.textContent = riskLabel;
+        uvIndexRiskElem.className = `uv-risk-badge ${riskClass}`;
+        uvIndexRiskElem.style.display = "inline-flex";
+      }
+    } else {
+      uvIndexValueElem.textContent = "N/A";
+      if (uvIndexRiskElem) {
+        uvIndexRiskElem.style.display = "none";
+      }
+    }
+  }
 
   // Reveal weather card with subtle fade-in and scale-up animation
   if (initialPlaceholder) initialPlaceholder.style.display = "none";

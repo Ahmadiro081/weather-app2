@@ -77,7 +77,7 @@ This mini-project addresses these challenges by:
 - **Serverless API Proxy:** Server-side route `/api/weather` that reads `process.env.OPENWEATHER_API_KEY` and calls OpenWeather with metric units.
 - **Target Geographic Focus:** Pre-configured quick-selection buttons for Nigerian cities (Abuja, Lagos, Kano, Ibadan, Port Harcourt) with arbitrary city search capabilities worldwide.
 - **Data Integration:** Live communication with the OpenWeather Current Weather REST API (`/data/2.5/weather`) via the serverless proxy.
-- **Data Fields Rendered:** City name, country identifier, current temperature (°C), feels-like temperature (°C), weather condition, descriptive text, official OpenWeather condition icon, humidity (%), wind speed (m/s), atmospheric pressure (hPa), and visibility (km).
+- **Data Fields Rendered:** City name, country identifier, current temperature (°C/°F), feels-like temperature (°C/°F), weather condition, descriptive text, official OpenWeather condition icon, humidity (%), wind speed (m/s), atmospheric pressure (hPa), visibility (km), and real-time UV Index with WHO risk classification.
 - **Interactive State Management:** Dynamic loading spinners, button disabling during in-flight requests, session search history, and contextual error banners.
 - **Device Support:** Cross-device responsiveness spanning mobile phones, tablets, laptops, and desktop monitors.
 

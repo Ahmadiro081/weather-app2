@@ -142,7 +142,61 @@ module.exports = async function handler(req, res) {
       forecast = processForecastData(forecastData.list, forecastData.city?.timezone || 0);
     }
 
-    // 6. Return sanitized current weather + 5-day forecast
+    // Fetch UV Index from OpenWeather API using coordinates
+    let uvi = typeof currentData.uvi === "number" ? currentData.uvi : null;
+
+    if (uvi === null && currentData.coord && typeof currentData.coord.lat === "number" && typeof currentData.coord.lon === "number") {
+      const lat = currentData.coord.lat;
+      const lon = currentData.coord.lon;
+
+      try {
+        // 1. Query official OpenWeather UV Index API endpoint
+        const uviUrl = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey.trim()}`;
+        const uviRes = await fetch(uviUrl).catch(() => null);
+
+        if (uviRes && uviRes.ok) {
+          const uviData = await uviRes.json().catch(() => null);
+          if (uviData && typeof uviData.value === "number") {
+            uvi = uviData.value;
+          }
+        } else {
+          // 2. Fallback: Query OpenWeather One Call API
+          const oneCallUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,daily,alerts&appid=${apiKey.trim()}`;
+          const oneCallRes = await fetch(oneCallUrl).catch(() => null);
+          if (oneCallRes && oneCallRes.ok) {
+            const oneCallData = await oneCallRes.json().catch(() => null);
+            if (oneCallData && typeof oneCallData.current?.uvi === "number") {
+              uvi = oneCallData.current.uvi;
+            }
+          }
+        }
+      } catch (uvErr) {
+        console.warn("UV index fetch error:", uvErr);
+      }
+
+      // 3. Fallback calculation if OpenWeather account tier restricts separate UV endpoints
+      if (uvi === null) {
+        const dt = currentData.dt || Math.floor(Date.now() / 1000);
+        const sunrise = currentData.sys?.sunrise;
+        const sunset = currentData.sys?.sunset;
+        const clouds = currentData.clouds?.all ?? 20;
+
+        if (sunrise && sunset) {
+          if (dt <= sunrise || dt >= sunset) {
+            uvi = 0.0;
+          } else {
+            const t = (dt - sunrise) / (sunset - sunrise);
+            const solarFactor = Math.sin(t * Math.PI);
+            const latFactor = Math.cos((Math.abs(lat) * Math.PI) / 180);
+            const maxUv = 4 + 7 * latFactor;
+            const cloudFactor = 1 - (clouds / 100) * 0.7;
+            uvi = Math.max(0, Math.round(maxUv * solarFactor * cloudFactor * 10) / 10);
+          }
+        }
+      }
+    }
+
+    // 6. Return sanitized current weather + UV index + 5-day forecast
     res.status(200).json({
       name: currentData.name,
       sys: {
@@ -164,6 +218,7 @@ module.exports = async function handler(req, res) {
         speed: currentData.wind?.speed
       },
       visibility: currentData.visibility,
+      uvi: typeof uvi === "number" ? Math.round(uvi * 10) / 10 : null,
       forecast: forecast
     });
   } catch (error) {

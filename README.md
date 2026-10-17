@@ -67,6 +67,8 @@ To ensure professional software engineering security standards, the frontend app
   - Relative humidity percentage (%)
   - Wind speed in meters per second (m/s)
   - Atmospheric pressure in hectopascals (hPa)
+  - Visibility distance in kilometers (km)
+  - Real-time **UV Index** with World Health Organization (WHO) risk level indicator (Low, Moderate, High, Very High, Extreme) powered by the OpenWeather API
 - **5-Day Weather Forecast UI Section:**
   - Aggregates daily forecasts for the next 5 days.
   - Displays day of the week, formatted date, condition icon, and text.

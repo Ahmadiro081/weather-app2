@@ -977,8 +977,8 @@ body {
 /* Weather Metrics Grid */
 .weather-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1.15rem;
   padding: 1.75rem 2rem;
   background: #f8fafc;
 }
@@ -1017,6 +1017,11 @@ body {
   height: 24px;
 }
 
+.metric-icon-uv {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
 .metric-details {
   display: flex;
   flex-direction: column;
@@ -1028,6 +1033,56 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.metric-value-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.15rem;
+}
+
+.uv-risk-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.uv-risk-badge.uv-low {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.uv-risk-badge.uv-moderate {
+  background: #fef9c3;
+  color: #a16207;
+  border: 1px solid #fef08a;
+}
+
+.uv-risk-badge.uv-high {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.uv-risk-badge.uv-very-high {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.uv-risk-badge.uv-extreme {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
 }
 
 /* 5-Day Weather Forecast Section */
