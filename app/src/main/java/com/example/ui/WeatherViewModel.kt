@@ -46,7 +46,8 @@ data class WeatherScreenState(
   val searchQuery: String = "",
   val apiKey: String = "",
   val searchHistory: List<String> = emptyList(),
-  val showApiKeyDialog: Boolean = false
+  val showApiKeyDialog: Boolean = false,
+  val isFahrenheit: Boolean = false
 )
 
 class WeatherViewModel(application: Application) : AndroidViewModel(application) {
@@ -60,6 +61,10 @@ class WeatherViewModel(application: Application) : AndroidViewModel(application)
   init {
     val savedKey = prefs.getString("openweather_api_key", "") ?: ""
     _state.update { it.copy(apiKey = savedKey) }
+  }
+
+  fun toggleTemperatureUnit() {
+    _state.update { it.copy(isFahrenheit = !it.isFahrenheit) }
   }
 
   fun onSearchQueryChange(query: String) {

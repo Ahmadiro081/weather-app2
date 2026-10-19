@@ -32,10 +32,12 @@ import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Compress
 import androidx.compose.material.icons.filled.DateRange
+import android.widget.Toast
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.WbSunny
@@ -69,8 +71,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -90,6 +95,8 @@ import kotlin.math.roundToInt
 fun WeatherScreen(viewModel: WeatherViewModel) {
   val state by viewModel.state.collectAsStateWithLifecycle()
   val focusManager = LocalFocusManager.current
+  val context = LocalContext.current
+  val clipboardManager = LocalClipboardManager.current
 
   Scaffold(
     topBar = {
@@ -465,9 +472,21 @@ fun WeatherScreen(viewModel: WeatherViewModel) {
           val success = (state.uiState as? WeatherUiState.Success)
           if (success != null) {
             Column {
-              WeatherDetailCard(weather = success.weather)
+              WeatherDetailCard(
+                weather = success.weather,
+                isFahrenheit = state.isFahrenheit,
+                onToggleUnit = { viewModel.toggleTemperatureUnit() },
+                onShare = {
+                  val summary = buildWeatherSummaryText(success.weather, state.isFahrenheit)
+                  clipboardManager.setText(AnnotatedString(summary))
+                  Toast.makeText(context, "Weather summary copied to clipboard! 📋", Toast.LENGTH_SHORT).show()
+                }
+              )
               if (success.forecast.isNotEmpty()) {
-                ForecastSectionCard(forecast = success.forecast)
+                ForecastSectionCard(
+                  forecast = success.forecast,
+                  isFahrenheit = state.isFahrenheit
+                )
               }
             }
           }
@@ -535,7 +554,12 @@ fun WeatherScreen(viewModel: WeatherViewModel) {
 }
 
 @Composable
-fun WeatherDetailCard(weather: WeatherResponse) {
+fun WeatherDetailCard(
+  weather: WeatherResponse,
+  isFahrenheit: Boolean = false,
+  onToggleUnit: () -> Unit = {},
+  onShare: () -> Unit = {}
+) {
   val weatherDesc = weather.weather.firstOrNull()
   val countryCode = weather.sys?.country ?: ""
   val countryName = when (countryCode) {
@@ -551,6 +575,10 @@ fun WeatherDetailCard(weather: WeatherResponse) {
   val dateFormatted = remember {
     SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault()).format(Date())
   }
+
+  val tempDisplay = if (isFahrenheit) ((weather.main.temp * 9 / 5) + 32).roundToInt() else weather.main.temp.roundToInt()
+  val feelsLikeDisplay = if (isFahrenheit) ((weather.main.feelsLike * 9 / 5) + 32).roundToInt() else weather.main.feelsLike.roundToInt()
+  val unitSymbol = if (isFahrenheit) "°F" else "°C"
 
   Card(
     shape = RoundedCornerShape(20.dp),
@@ -582,7 +610,7 @@ fun WeatherDetailCard(weather: WeatherResponse) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
           ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
               Text(
                 text = weather.name,
                 style = MaterialTheme.typography.headlineMedium,
@@ -597,17 +625,57 @@ fun WeatherDetailCard(weather: WeatherResponse) {
                 )
               }
             }
-            Surface(
-              shape = RoundedCornerShape(12.dp),
-              color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-              Text(
-                text = "REAL-TIME",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-              )
+              // Temperature Unit Toggle Pill
+              Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f),
+                modifier = Modifier
+                  .clip(RoundedCornerShape(12.dp))
+                  .clickable { onToggleUnit() }
+                  .testTag("unit_toggle_btn")
+              ) {
+                Text(
+                  text = if (isFahrenheit) "°F" else "°C",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onPrimary,
+                  fontWeight = FontWeight.ExtraBold,
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                )
+              }
+
+              // Share Weather Summary Button
+              IconButton(
+                onClick = onShare,
+                modifier = Modifier
+                  .size(36.dp)
+                  .clip(CircleShape)
+                  .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f))
+                  .testTag("share_weather_btn")
+              ) {
+                Icon(
+                  imageVector = Icons.Default.Share,
+                  contentDescription = "Share weather summary to clipboard",
+                  tint = MaterialTheme.colorScheme.onPrimary,
+                  modifier = Modifier.size(18.dp)
+                )
+              }
+
+              Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)
+              ) {
+                Text(
+                  text = "REAL-TIME",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onPrimary,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+              }
             }
           }
           Spacer(modifier = Modifier.height(4.dp))
@@ -630,14 +698,14 @@ fun WeatherDetailCard(weather: WeatherResponse) {
         Column {
           Row(verticalAlignment = Alignment.Top) {
             Text(
-              text = "${weather.main.temp.roundToInt()}",
+              text = "$tempDisplay",
               fontSize = 58.sp,
               fontWeight = FontWeight.Black,
               lineHeight = 60.sp,
               color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-              text = "°C",
+              text = unitSymbol,
               fontSize = 28.sp,
               fontWeight = FontWeight.Bold,
               color = MaterialTheme.colorScheme.primary,
@@ -645,7 +713,7 @@ fun WeatherDetailCard(weather: WeatherResponse) {
             )
           }
           Text(
-            text = "Feels Like: ${weather.main.feelsLike.roundToInt()}°C",
+            text = "Feels Like: $feelsLikeDisplay$unitSymbol",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
           )
@@ -775,7 +843,10 @@ fun MetricItem(
 }
 
 @Composable
-fun ForecastSectionCard(forecast: List<com.example.data.model.ForecastDay>) {
+fun ForecastSectionCard(
+  forecast: List<com.example.data.model.ForecastDay>,
+  isFahrenheit: Boolean = false
+) {
   Card(
     shape = RoundedCornerShape(20.dp),
     modifier = Modifier
@@ -876,8 +947,12 @@ fun ForecastSectionCard(forecast: List<com.example.data.model.ForecastDay>) {
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
+                  val maxDisplay = if (isFahrenheit) ((day.tempMax * 9 / 5) + 32) else day.tempMax
+                  val minDisplay = if (isFahrenheit) ((day.tempMin * 9 / 5) + 32) else day.tempMin
+                  val unitSymbol = if (isFahrenheit) "°F" else "°C"
+
                   Text(
-                    text = "${day.tempMax}°C",
+                    text = "$maxDisplay$unitSymbol",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color(0xFFDC2626)
@@ -888,7 +963,7 @@ fun ForecastSectionCard(forecast: List<com.example.data.model.ForecastDay>) {
                     color = MaterialTheme.colorScheme.outline
                   )
                   Text(
-                    text = "${day.tempMin}°C",
+                    text = "$minDisplay$unitSymbol",
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -954,4 +1029,28 @@ fun ApiKeyConfigDialog(
       }
     }
   )
+}
+
+fun buildWeatherSummaryText(weather: WeatherResponse, isFahrenheit: Boolean): String {
+  val country = weather.sys?.country ?: ""
+  val location = if (country.isNotEmpty()) "${weather.name}, $country" else weather.name
+  val dateFormatted = SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault()).format(Date())
+  val temp = if (isFahrenheit) ((weather.main.temp * 9 / 5) + 32).roundToInt() else weather.main.temp.roundToInt()
+  val feels = if (isFahrenheit) ((weather.main.feelsLike * 9 / 5) + 32).roundToInt() else weather.main.feelsLike.roundToInt()
+  val unit = if (isFahrenheit) "°F" else "°C"
+  val desc = weather.weather.firstOrNull()?.description ?: "clear sky"
+  val cond = weather.weather.firstOrNull()?.main ?: "Clear"
+  val wind = weather.wind?.speed?.let { String.format(Locale.US, "%.1f", it) } ?: "0.0"
+  val visibilityText = weather.visibility?.let { String.format(Locale.US, "%.1f km", it / 1000.0) } ?: "N/A"
+
+  return """
+🌤️ Weather Report for $location
+📅 $dateFormatted
+🌡️ Temperature: $temp$unit (Feels like: $feels$unit)
+☁️ Conditions: $cond ($desc)
+💧 Humidity: ${weather.main.humidity}% | 💨 Wind: $wind m/s
+🧭 Pressure: ${weather.main.pressure} hPa | 👁️ Visibility: $visibilityText
+
+Shared via FUDMA Weather Dashboard • GET 411 Artificial Intelligence Group 14
+  """.trimIndent()
 }
