@@ -73,6 +73,10 @@ To ensure professional software engineering security standards, the frontend app
   - Automatically queries official meteorological alerts from the OpenWeather API (One Call & active severe weather classification system) for the searched municipality.
   - Displays a high-visibility, accessible banner notification with pulsing warning icon, issuing organization, alert event title, and description.
   - Allows immediate one-click dismissal.
+- **Weather Summary Share to Clipboard:**
+  - One-click share button on the Weather Presentation Card that copies a formatted, emoji-enhanced weather summary directly to the system clipboard.
+  - Respects active temperature unit settings (°C or °F), current metrics, UV index, and active severe alerts.
+  - Provides visual button confirmation ("Copied!") and floating toast feedback.
 - **5-Day Weather Forecast UI Section:**
   - Aggregates daily forecasts for the next 5 days.
   - Displays day of the week, formatted date, condition icon, and text.

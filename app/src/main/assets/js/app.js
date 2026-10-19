@@ -83,6 +83,12 @@ const unitOptC = document.getElementById("unitOptC");
 const unitOptF = document.getElementById("unitOptF");
 const tempUnitElem = document.getElementById("tempUnit");
 
+// Share button and toast notification elements
+const shareWeatherBtn = document.getElementById("shareWeatherBtn");
+const shareBtnText = document.getElementById("shareBtnText");
+const toastNotification = document.getElementById("toastNotification");
+const toastMessage = document.getElementById("toastMessage");
+
 const cityNameElem = document.getElementById("cityName");
 const countryNameElem = document.getElementById("countryName");
 const weatherDateElem = document.getElementById("weatherDate");
@@ -708,7 +714,162 @@ function renderSessionHistory() {
 }
 
 // ============================================================================
-// 6. CONTROLLER & EVENT COORDINATION
+// 6. WEATHER SUMMARY SHARING & CLIPBOARD CONTROLLER
+// ============================================================================
+
+let toastTimer = null;
+let shareSuccessResetTimer = null;
+
+/**
+ * Displays a non-intrusive floating toast notification.
+ * 
+ * @param {string} message - Notification text
+ * @param {number} duration - Display time in ms
+ */
+function showToast(message, duration = 2800) {
+  if (!toastNotification) return;
+
+  if (toastMessage) {
+    toastMessage.textContent = message;
+  }
+  toastNotification.classList.add("active");
+
+  if (toastTimer) {
+    clearTimeout(toastTimer);
+  }
+
+  toastTimer = setTimeout(() => {
+    toastNotification.classList.remove("active");
+  }, duration);
+}
+
+/**
+ * Generates an informative, formatted text summary of current weather conditions.
+ * Respects the active temperature unit (°C / °F) and active alert states.
+ * 
+ * @returns {string} Formatted text summary suitable for messaging and clipboard
+ */
+function generateWeatherSummary() {
+  const city = cityNameElem ? cityNameElem.textContent.trim() : "Current Location";
+  const rawCountry = countryNameElem ? countryNameElem.textContent.trim() : "";
+  const country = rawCountry.replace(/^,\s*/, "");
+  const locationText = country ? `${city}, ${country}` : city;
+  const dateText = weatherDateElem ? weatherDateElem.textContent.trim() : new Date().toLocaleDateString();
+
+  const temp = currentTempElem ? currentTempElem.textContent.trim() : "--";
+  const unit = tempUnitElem ? tempUnitElem.textContent.trim() : "°C";
+  const rawFeels = feelsLikeElem ? feelsLikeElem.textContent.trim() : "";
+  const feelsLike = rawFeels.replace(/^Feels Like:\s*/i, "");
+
+  const condition = weatherConditionElem ? weatherConditionElem.textContent.trim() : "Clear";
+  const description = weatherDescriptionElem ? weatherDescriptionElem.textContent.trim() : "";
+
+  const humidity = humidityValueElem ? humidityValueElem.textContent.trim() : "--";
+  const windSpeed = windSpeedValueElem ? windSpeedValueElem.textContent.trim() : "--";
+  const pressure = pressureValueElem ? pressureValueElem.textContent.trim() : "--";
+  const visibility = visibilityValueElem ? visibilityValueElem.textContent.trim() : "--";
+
+  const uvi = uvIndexValueElem ? uvIndexValueElem.textContent.trim() : "";
+  const uviRisk = uvIndexRiskElem ? uvIndexRiskElem.textContent.trim() : "";
+
+  let lines = [
+    `🌤️ Weather Report for ${locationText}`,
+    `📅 ${dateText}`,
+    `🌡️ Temperature: ${temp}${unit} (Feels like: ${feelsLike})`,
+    `☁️ Conditions: ${condition} (${description})`,
+    `💧 Humidity: ${humidity} | 💨 Wind Speed: ${windSpeed}`,
+    `🧭 Atmospheric Pressure: ${pressure} | 👁️ Visibility: ${visibility}`
+  ];
+
+  if (uvi && uvi !== "N/A") {
+    lines.push(`☀️ UV Index: ${uvi}${uviRisk ? ` [${uviRisk}]` : ""}`);
+  }
+
+  if (severeAlertBanner && severeAlertBanner.style.display !== "none") {
+    const alertTitle = severeAlertEvent ? severeAlertEvent.textContent.trim() : "Severe Weather Advisory";
+    lines.push(`⚠️ Active Meteorological Alert: ${alertTitle}`);
+  }
+
+  lines.push(`\nShared via FUDMA Weather Dashboard • GET 411 Artificial Intelligence Group 14`);
+
+  return lines.join("\n");
+}
+
+/**
+ * Copies the current weather summary to the user's system clipboard.
+ * Provides immediate visual feedback on the button and displays a toast notification.
+ */
+async function shareWeatherSummary() {
+  const summaryText = generateWeatherSummary();
+  let copied = false;
+
+  // Modern Async Clipboard API
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+    try {
+      await navigator.clipboard.writeText(summaryText);
+      copied = true;
+    } catch (err) {
+      console.warn("Async clipboard copy failed, attempting execCommand fallback:", err);
+    }
+  }
+
+  // Cross-browser synchronous fallback
+  if (!copied) {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = summaryText;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.top = "0";
+      textarea.style.left = "-9999px";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+    } catch (fallbackErr) {
+      console.error("Clipboard copy fallback error:", fallbackErr);
+    }
+  }
+
+  if (copied) {
+    if (shareWeatherBtn) {
+      shareWeatherBtn.classList.add("copied");
+      shareWeatherBtn.innerHTML = `
+        <svg class="share-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span id="shareBtnText">Copied!</span>
+      `;
+
+      if (shareSuccessResetTimer) {
+        clearTimeout(shareSuccessResetTimer);
+      }
+
+      shareSuccessResetTimer = setTimeout(() => {
+        if (shareWeatherBtn) {
+          shareWeatherBtn.classList.remove("copied");
+          shareWeatherBtn.innerHTML = `
+            <svg class="share-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+              <polyline points="16 6 12 2 8 6"></polyline>
+              <line x1="12" y1="2" x2="12" y2="15"></line>
+            </svg>
+            <span id="shareBtnText">Share</span>
+          `;
+        }
+      }, 2500);
+    }
+
+    showToast("Weather summary copied to clipboard! 📋");
+  } else {
+    showToast("Unable to copy to clipboard. Please check browser permissions.");
+  }
+}
+
+// ============================================================================
+// 7. CONTROLLER & EVENT COORDINATION
 // ============================================================================
 
 /**
@@ -808,6 +969,13 @@ if (unitToggleBtn) {
 if (dismissSevereAlertBtn) {
   dismissSevereAlertBtn.addEventListener("click", () => {
     hideSevereAlert();
+  });
+}
+
+// Share Weather Summary Button Click
+if (shareWeatherBtn) {
+  shareWeatherBtn.addEventListener("click", () => {
+    shareWeatherSummary();
   });
 }
 
