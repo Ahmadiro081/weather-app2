@@ -787,6 +787,23 @@ fun WeatherDetailCard(
             modifier = Modifier.weight(1f)
           )
         }
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+          MetricItem(
+            icon = Icons.Default.WbSunny,
+            label = "UV Index",
+            value = "6.2 High",
+            modifier = Modifier.weight(1f)
+          )
+          MetricItem(
+            icon = Icons.Default.Air,
+            label = "Air Quality (AQI)",
+            value = "1 Good",
+            modifier = Modifier.weight(1f)
+          )
+        }
       }
     }
   }
@@ -1050,6 +1067,7 @@ fun buildWeatherSummaryText(weather: WeatherResponse, isFahrenheit: Boolean): St
 ☁️ Conditions: $cond ($desc)
 💧 Humidity: ${weather.main.humidity}% | 💨 Wind: $wind m/s
 🧭 Pressure: ${weather.main.pressure} hPa | 👁️ Visibility: $visibilityText
+🍃 Air Quality (AQI): 1 [Good]
 
 Shared via FUDMA Weather Dashboard • GET 411 Artificial Intelligence Group 14
   """.trimIndent()

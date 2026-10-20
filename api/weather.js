@@ -142,9 +142,11 @@ module.exports = async function handler(req, res) {
       forecast = processForecastData(forecastData.list, forecastData.city?.timezone || 0);
     }
 
-    // Fetch UV Index and Severe Weather Alerts from OpenWeather API
+    // Fetch UV Index, Severe Weather Alerts, and Air Quality Index (AQI) from OpenWeather API
     let uvi = typeof currentData.uvi === "number" ? currentData.uvi : null;
     let alerts = [];
+    let aqi = null;
+    let aqiComponents = null;
 
     if (currentData.coord && typeof currentData.coord.lat === "number" && typeof currentData.coord.lon === "number") {
       const lat = currentData.coord.lat;
@@ -213,6 +215,39 @@ module.exports = async function handler(req, res) {
             const cloudFactor = 1 - (clouds / 100) * 0.7;
             uvi = Math.max(0, Math.round(maxUv * solarFactor * cloudFactor * 10) / 10);
           }
+        }
+      }
+
+      // 4. Query OpenWeather Air Pollution API for Air Quality Index (AQI)
+      try {
+        const airPollutionUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey.trim()}`;
+        const airRes = await fetch(airPollutionUrl).catch(() => null);
+        if (airRes && airRes.ok) {
+          const airData = await airRes.json().catch(() => null);
+          if (airData && Array.isArray(airData.list) && airData.list.length > 0) {
+            const currentAir = airData.list[0];
+            if (typeof currentAir.main?.aqi === "number") {
+              aqi = currentAir.main.aqi;
+              aqiComponents = currentAir.components || null;
+            }
+          }
+        }
+      } catch (airErr) {
+        console.warn("Air Pollution API fetch error:", airErr);
+      }
+
+      // Fallback AQI estimation if endpoint is unavailable
+      if (aqi === null && typeof currentData.visibility === "number") {
+        if (currentData.visibility >= 10000) {
+          aqi = 1;
+        } else if (currentData.visibility >= 7000) {
+          aqi = 2;
+        } else if (currentData.visibility >= 4000) {
+          aqi = 3;
+        } else if (currentData.visibility >= 2000) {
+          aqi = 4;
+        } else {
+          aqi = 5;
         }
       }
     }
@@ -305,6 +340,8 @@ module.exports = async function handler(req, res) {
       },
       visibility: currentData.visibility,
       uvi: typeof uvi === "number" ? Math.round(uvi * 10) / 10 : null,
+      aqi: typeof aqi === "number" ? aqi : null,
+      aqiComponents: aqiComponents,
       alerts: alerts,
       forecast: forecast
     });

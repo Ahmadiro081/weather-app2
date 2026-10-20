@@ -104,6 +104,8 @@ const pressureValueElem = document.getElementById("pressureValue");
 const visibilityValueElem = document.getElementById("visibilityValue");
 const uvIndexValueElem = document.getElementById("uvIndexValue");
 const uvIndexRiskElem = document.getElementById("uvIndexRisk");
+const aqiIndexValueElem = document.getElementById("aqiIndexValue");
+const aqiRiskBadgeElem = document.getElementById("aqiRiskBadge");
 
 const historyContainer = document.getElementById("historyContainer");
 const historyChips = document.getElementById("historyChips");
@@ -462,6 +464,43 @@ function renderWeatherData(data) {
     }
   }
 
+  // Air Quality Index (AQI) metric and categorization
+  if (aqiIndexValueElem) {
+    if (typeof data.aqi === "number") {
+      const aqiVal = data.aqi;
+      aqiIndexValueElem.textContent = `${aqiVal}`;
+
+      if (aqiRiskBadgeElem) {
+        let aqiLabel = "Good";
+        let aqiClass = "aqi-good";
+        if (aqiVal === 1) {
+          aqiLabel = "Good";
+          aqiClass = "aqi-good";
+        } else if (aqiVal === 2) {
+          aqiLabel = "Fair";
+          aqiClass = "aqi-fair";
+        } else if (aqiVal === 3) {
+          aqiLabel = "Moderate";
+          aqiClass = "aqi-moderate";
+        } else if (aqiVal === 4) {
+          aqiLabel = "Poor";
+          aqiClass = "aqi-poor";
+        } else if (aqiVal >= 5) {
+          aqiLabel = "Very Poor";
+          aqiClass = "aqi-very-poor";
+        }
+        aqiRiskBadgeElem.textContent = aqiLabel;
+        aqiRiskBadgeElem.className = `aqi-badge ${aqiClass}`;
+        aqiRiskBadgeElem.style.display = "inline-flex";
+      }
+    } else {
+      aqiIndexValueElem.textContent = "N/A";
+      if (aqiRiskBadgeElem) {
+        aqiRiskBadgeElem.style.display = "none";
+      }
+    }
+  }
+
   // Reveal weather card with subtle fade-in and scale-up animation
   if (initialPlaceholder) initialPlaceholder.style.display = "none";
   if (weatherCard) {
@@ -771,6 +810,8 @@ function generateWeatherSummary() {
 
   const uvi = uvIndexValueElem ? uvIndexValueElem.textContent.trim() : "";
   const uviRisk = uvIndexRiskElem ? uvIndexRiskElem.textContent.trim() : "";
+  const aqiVal = aqiIndexValueElem ? aqiIndexValueElem.textContent.trim() : "";
+  const aqiRisk = aqiRiskBadgeElem ? aqiRiskBadgeElem.textContent.trim() : "";
 
   let lines = [
     `🌤️ Weather Report for ${locationText}`,
@@ -783,6 +824,10 @@ function generateWeatherSummary() {
 
   if (uvi && uvi !== "N/A") {
     lines.push(`☀️ UV Index: ${uvi}${uviRisk ? ` [${uviRisk}]` : ""}`);
+  }
+
+  if (aqiVal && aqiVal !== "N/A") {
+    lines.push(`🍃 Air Quality (AQI): ${aqiVal}${aqiRisk ? ` [${aqiRisk}]` : ""}`);
   }
 
   if (severeAlertBanner && severeAlertBanner.style.display !== "none") {

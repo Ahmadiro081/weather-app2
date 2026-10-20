@@ -6,6 +6,9 @@
 **Group:** Group 14  
 **Academic Session:** 2026/2027  
 **Lecturer:** Nura Muhammad  
+**Application Developer:** Ahmad Ibrahim  
+**Developer Contact:** [08146557980](tel:08146557980)  
+**Developer Profile / CV:** [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/)  
 **Target Deployment Platform:** Vercel (Production Serverless Architecture)
 
 ---
@@ -19,6 +22,7 @@
 - **Group:** Group 14
 - **Academic Session:** 2026/2027
 - **Lecturer:** Nura Muhammad
+- **Developed by:** Ahmad Ibrahim ([08146557980](tel:08146557980) • [CV / Profile](https://ahmad-ibrahim-cv.vercel.app/))
 
 ### Group 14 Student Members
 | S/N | Name | Matric Number | Department |
@@ -69,6 +73,7 @@ To ensure professional software engineering security standards, the frontend app
   - Atmospheric pressure in hectopascals (hPa)
   - Visibility distance in kilometers (km)
   - Real-time **UV Index** with World Health Organization (WHO) risk level indicator (Low, Moderate, High, Very High, Extreme) powered by the OpenWeather API
+  - **Air Quality Index (AQI)** card powered by the OpenWeather Air Pollution API (`/data/2.5/air_pollution`) with risk level categorization (1 - Good, 2 - Fair, 3 - Moderate, 4 - Poor, 5 - Very Poor)
 - **Severe Weather Alert Banner Notification:**
   - Automatically queries official meteorological alerts from the OpenWeather API (One Call & active severe weather classification system) for the searched municipality.
   - Displays a high-visibility, accessible banner notification with pulsing warning icon, issuing organization, alert event title, and description.

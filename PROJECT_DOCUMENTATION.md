@@ -7,6 +7,7 @@
 **Group:** Group 14  
 **Academic Session:** 2026/2027  
 **Lecturer / Supervisor:** Nura Muhammad  
+**Lead Developer:** Ahmad Ibrahim (Phone: [08146557980](tel:08146557980) • CV / Profile: [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/))  
 
 ---
 
@@ -18,6 +19,9 @@
 - **Group Allocation:** Group 14
 - **Academic Session:** 2026/2027
 - **Course Lecturer:** Nura Muhammad
+- **Application Developer:** Ahmad Ibrahim
+- **Developer Contact:** [08146557980](tel:08146557980)
+- **Developer Portfolio / CV:** [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/)
 
 ### Group 14 Student Members Roster
 | No. | Student Name | Matriculation Number | Department |
@@ -59,7 +63,7 @@ This mini-project addresses these challenges by:
 ### Functional Objectives:
 - To develop an intuitive, responsive user interface allowing users to look up weather conditions for any worldwide city.
 - To provide dedicated quick-selection capabilities for major Nigerian metropolitan hubs, specifically Abuja (the Federal Capital Territory) and Lagos (the commercial center).
-- To retrieve and display accurate real-time metrics including temperature in Celsius (°C) and Fahrenheit (°F) via an interactive unit toggle switch, feels-like temperature, humidity, wind velocity, atmospheric pressure, visibility, and UV index with risk categorization.
+- To retrieve and display accurate real-time metrics including temperature in Celsius (°C) and Fahrenheit (°F) via an interactive unit toggle switch, feels-like temperature, humidity, wind velocity, atmospheric pressure, visibility, UV index with risk categorization, and Air Quality Index (AQI) with 5-level risk classification.
 - To detect and display severe weather alerts and meteorological advisories from the OpenWeather API for active searched cities via a dismissible notification banner.
 - To allow users to effortlessly share and copy current meteorological summaries to the system clipboard with instant UI and toast confirmation.
 - To implement defensive input validation and informative, user-friendly error alerts for edge cases.
@@ -78,8 +82,8 @@ This mini-project addresses these challenges by:
 - **Core Technology:** Implementation strictly in standard HTML5, CSS3, Vanilla JavaScript (ES6+), and Node.js Serverless Functions on Vercel.
 - **Serverless API Proxy:** Server-side route `/api/weather` that reads `process.env.OPENWEATHER_API_KEY` and calls OpenWeather with metric units.
 - **Target Geographic Focus:** Pre-configured quick-selection buttons for Nigerian cities (Abuja, Lagos, Kano, Ibadan, Port Harcourt) with arbitrary city search capabilities worldwide.
-- **Data Integration:** Live communication with the OpenWeather Current Weather REST API (`/data/2.5/weather`), UV endpoints, and One Call alert data via the serverless proxy.
-- **Data Fields Rendered:** City name, country identifier, current temperature (°C/°F), feels-like temperature (°C/°F), weather condition, descriptive text, official OpenWeather condition icon, humidity (%), wind speed (m/s), atmospheric pressure (hPa), visibility (km), real-time UV Index with WHO risk classification, and active severe weather alert notifications.
+- **Data Integration:** Live communication with the OpenWeather Current Weather REST API (`/data/2.5/weather`), Air Pollution REST API (`/data/2.5/air_pollution`), UV endpoints, and One Call alert data via the serverless proxy.
+- **Data Fields Rendered:** City name, country identifier, current temperature (°C/°F), feels-like temperature (°C/°F), weather condition, descriptive text, official OpenWeather condition icon, humidity (%), wind speed (m/s), atmospheric pressure (hPa), visibility (km), real-time UV Index with WHO risk classification, Air Quality Index (AQI) with 5-tier classification (Good, Fair, Moderate, Poor, Very Poor), and active severe weather alert notifications.
 - **Interactive State Management:** Dynamic loading spinners, button disabling during in-flight requests, session search history, dismissible severe alert banner, one-click clipboard weather summary sharing with toast alerts, and contextual error banners.
 - **Device Support:** Cross-device responsiveness spanning mobile phones, tablets, laptops, and desktop monitors.
 
