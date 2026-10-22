@@ -410,6 +410,69 @@ function toggleTemperatureUnit() {
 }
 
 /**
+ * Applies weather-condition theme classes to the .weather-card element
+ * so CSS animations and gradients subtly transition based on current meteorological conditions
+ * (warm ambers for sunny, cool blues for rainy, fresh cyans for drizzle, deep indigo for storm, etc.).
+ * 
+ * @param {HTMLElement} card - The .weather-card DOM element
+ * @param {number} weatherId - OpenWeather weather condition ID
+ * @param {string} condition - Main weather condition string (e.g. "Clear", "Rain")
+ * @param {number} tempC - Current temperature in Celsius
+ */
+function applyWeatherCardTheme(card, weatherId, condition, tempC) {
+  if (!card) return;
+
+  const allThemes = [
+    "weather-theme-clear",
+    "weather-theme-clouds",
+    "weather-theme-rain",
+    "weather-theme-drizzle",
+    "weather-theme-thunderstorm",
+    "weather-theme-snow",
+    "weather-theme-atmosphere"
+  ];
+  allThemes.forEach(cls => card.classList.remove(cls));
+
+  const cond = (condition || "").toLowerCase().trim();
+  let selectedTheme = "weather-theme-clear";
+
+  if (weatherId >= 200 && weatherId < 300) {
+    selectedTheme = "weather-theme-thunderstorm";
+  } else if (weatherId >= 300 && weatherId < 400) {
+    selectedTheme = "weather-theme-drizzle";
+  } else if (weatherId >= 500 && weatherId < 600) {
+    selectedTheme = "weather-theme-rain";
+  } else if (weatherId >= 600 && weatherId < 700) {
+    selectedTheme = "weather-theme-snow";
+  } else if (weatherId >= 700 && weatherId < 800) {
+    selectedTheme = "weather-theme-atmosphere";
+  } else if (weatherId === 800) {
+    selectedTheme = "weather-theme-clear";
+  } else if (weatherId > 800) {
+    selectedTheme = "weather-theme-clouds";
+  } else {
+    // Condition string fallback
+    if (cond.includes("thunder") || cond.includes("storm") || cond.includes("lightning")) {
+      selectedTheme = "weather-theme-thunderstorm";
+    } else if (cond.includes("drizzle")) {
+      selectedTheme = "weather-theme-drizzle";
+    } else if (cond.includes("rain") || cond.includes("shower")) {
+      selectedTheme = "weather-theme-rain";
+    } else if (cond.includes("snow") || cond.includes("sleet") || cond.includes("ice") || cond.includes("blizzard")) {
+      selectedTheme = "weather-theme-snow";
+    } else if (cond.includes("cloud") || cond.includes("overcast")) {
+      selectedTheme = "weather-theme-clouds";
+    } else if (cond.includes("mist") || cond.includes("fog") || cond.includes("haze") || cond.includes("dust") || cond.includes("smoke")) {
+      selectedTheme = "weather-theme-atmosphere";
+    } else {
+      selectedTheme = "weather-theme-clear";
+    }
+  }
+
+  card.classList.add(selectedTheme);
+}
+
+/**
  * Renders the fetched weather data into the UI components.
  * 
  * @param {Object} data - Clean JSON object from serverless API
@@ -597,6 +660,11 @@ function renderWeatherData(data) {
   // Reveal weather card with subtle fade-in and scale-up animation
   if (initialPlaceholder) initialPlaceholder.style.display = "none";
   if (weatherCard) {
+    // Apply meteorological condition theme class for smooth background gradient transition
+    const weatherId = weatherObj && typeof weatherObj.id === "number" ? weatherObj.id : 800;
+    const rawTempC = typeof data.main?.temp === "number" ? data.main.temp : 25;
+    applyWeatherCardTheme(weatherCard, weatherId, condition, rawTempC);
+
     weatherCard.classList.remove("active");
     weatherCard.classList.remove("animate-card");
     void weatherCard.offsetWidth; // Force reflow to smoothly re-trigger fade-in and scale-up animation

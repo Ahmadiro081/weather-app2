@@ -842,8 +842,8 @@ body {
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
   overflow: hidden;
-  transition: var(--transition);
-  will-change: transform, opacity;
+  transition: border-color 0.85s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.85s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.25s ease;
+  will-change: transform, opacity, box-shadow;
   transform-origin: center top;
 }
 
@@ -870,14 +870,157 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Subtle background gradient pan animation across weather card header */
+@keyframes weatherGradientPan {
+  0% {
+    background-position: 0% 40%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+  100% {
+    background-position: 0% 40%;
+  }
+}
+
 .weather-card-header {
   background: var(--primary-gradient);
+  background-size: 220% 220%;
+  animation: weatherGradientPan 14s ease-in-out infinite alternate;
   color: #ffffff;
   padding: 1.75rem 2rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   position: relative;
+  overflow: hidden;
+  transition: background 0.85s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.85s ease;
+}
+
+/* Subtle ambient luminous shimmer overlay on card header */
+.weather-card-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.22), transparent 55%);
+  pointer-events: none;
+  opacity: 0.8;
+  animation: headerAmbientShimmer 8s ease-in-out infinite alternate;
+}
+
+@keyframes headerAmbientShimmer {
+  0% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.04); }
+  100% { opacity: 0.45; transform: scale(1); }
+}
+
+/* ==========================================================================
+   Weather Condition Background Gradient Themes
+   ========================================================================== */
+
+/* 1. Sunny / Clear Weather (Warm Golden Ambers & Radiant Tangerine) */
+.weather-card.weather-theme-clear {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(245, 158, 11, 0.22), var(--shadow-md);
+}
+
+.weather-card.weather-theme-clear .weather-card-header {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 45%, #d97706 75%, #b45309 100%);
+  background-size: 220% 220%;
+}
+
+.weather-card.weather-theme-clear .weather-primary-body {
+  background: linear-gradient(180deg, rgba(254, 243, 199, 0.35) 0%, #ffffff 85%);
+}
+
+/* 2. Rainy Weather (Cool Aquatic Blues & Ocean Navy) */
+.weather-card.weather-theme-rain {
+  border-color: rgba(2, 132, 199, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(2, 132, 199, 0.26), var(--shadow-md);
+}
+
+.weather-card.weather-theme-rain .weather-card-header {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 40%, #1e40af 75%, #1e3a8a 100%);
+  background-size: 220% 220%;
+}
+
+.weather-card.weather-theme-rain .weather-primary-body {
+  background: linear-gradient(180deg, rgba(224, 242, 254, 0.38) 0%, #ffffff 85%);
+}
+
+/* 3. Drizzle Weather (Fresh Cyan & Cerulean Mist) */
+.weather-card.weather-theme-drizzle {
+  border-color: rgba(8, 145, 178, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(8, 145, 178, 0.22), var(--shadow-md);
+}
+
+.weather-card.weather-theme-drizzle .weather-card-header {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 40%, #155e75 75%, #164e63 100%);
+  background-size: 220% 220%;
+}
+
+.weather-card.weather-theme-drizzle .weather-primary-body {
+  background: linear-gradient(180deg, rgba(207, 250, 254, 0.38) 0%, #ffffff 85%);
+}
+
+/* 4. Thunderstorm Weather (Electric Deep Indigo & Midnight Violet) */
+.weather-card.weather-theme-thunderstorm {
+  border-color: rgba(79, 70, 229, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(79, 70, 229, 0.3), var(--shadow-md);
+}
+
+.weather-card.weather-theme-thunderstorm .weather-card-header {
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 40%, #312e81 70%, #581c87 100%);
+  background-size: 220% 220%;
+}
+
+.weather-card.weather-theme-thunderstorm .weather-primary-body {
+  background: linear-gradient(180deg, rgba(238, 242, 255, 0.38) 0%, #ffffff 85%);
+}
+
+/* 5. Snow / Freezing Weather (Glacial Frost & Ice Cyan) */
+.weather-card.weather-theme-snow {
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(6, 182, 212, 0.24), var(--shadow-md);
+}
+
+.weather-card.weather-theme-snow .weather-card-header {
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 40%, #3b82f6 75%, #2563eb 100%);
+  background-size: 220% 220%;
+}
+
+.weather-card.weather-theme-snow .weather-primary-body {
+  background: linear-gradient(180deg, rgba(236, 254, 255, 0.45) 0%, #ffffff 85%);
+}
+
+/* 6. Cloudy / Overcast Weather (Muted Steel Slate & Silver Cloud) */
+.weather-card.weather-theme-clouds {
+  border-color: rgba(100, 116, 139, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(100, 116, 139, 0.2), var(--shadow-md);
+}
+
+.weather-card.weather-theme-clouds .weather-card-header {
+  background: linear-gradient(135deg, #64748b 0%, #475569 40%, #334155 75%, #1e293b 100%);
+  background-size: 220% 220%;
+}
+
+.weather-card.weather-theme-clouds .weather-primary-body {
+  background: linear-gradient(180deg, rgba(241, 245, 249, 0.55) 0%, #ffffff 85%);
+}
+
+/* 7. Atmospheric Haze / Fog / Dust / Mist (Dusty Sandstone & Warm Taupe) */
+.weather-card.weather-theme-atmosphere {
+  border-color: rgba(120, 113, 108, 0.4);
+  box-shadow: 0 12px 28px -4px rgba(120, 113, 108, 0.2), var(--shadow-md);
+}
+
+.weather-card.weather-theme-atmosphere .weather-card-header {
+  background: linear-gradient(135deg, #78716c 0%, #57534e 40%, #44403c 75%, #292524 100%);
+  background-size: 220% 220%;
+}
+
+.weather-card.weather-theme-atmosphere .weather-primary-body {
+  background: linear-gradient(180deg, rgba(245, 245, 244, 0.55) 0%, #ffffff 85%);
 }
 
 .location-info {
@@ -1120,6 +1263,7 @@ body {
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
   background: #ffffff;
+  transition: background 0.85s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .temperature-group {
