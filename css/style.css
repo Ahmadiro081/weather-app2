@@ -26,6 +26,28 @@
   --transition: all 0.2s ease-in-out;
 }
 
+/* ==========================================================================
+   Dark Mode Theme System (CSS Custom Properties)
+   Persisted via localStorage to improve visibility during nighttime use.
+   ========================================================================== */
+[data-theme="dark"] {
+  --primary: #38bdf8;
+  --primary-dark: #0284c7;
+  --primary-light: #0c2d48;
+  --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0f172a 100%);
+  --card-gradient: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  --accent: #fbbf24;
+  --accent-hover: #f59e0b;
+  --surface: #1e293b;
+  --background: #0b1120;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.6), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
+}
+
 /* Reset & Box Sizing */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -42,6 +64,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* App Wrapper */
@@ -187,6 +210,83 @@ body {
 
 .dev-header-badge:hover svg {
   stroke: #ffffff;
+}
+
+/* User-facing Dark Mode Theme Toggle Switch */
+.theme-toggle-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: var(--transition);
+  min-height: 44px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.theme-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+.sun-icon {
+  display: block;
+  color: #f59e0b;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+.moon-icon {
+  display: none;
+  color: #38bdf8;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+.theme-toggle-label {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Dark mode active state on toggle button */
+[data-theme="dark"] .sun-icon {
+  display: none;
+}
+
+[data-theme="dark"] .moon-icon {
+  display: block;
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #38bdf8;
 }
 
 .key-toggle-btn {
