@@ -320,6 +320,10 @@ module.exports = async function handler(req, res) {
     // 6. Return sanitized current weather + UV index + severe alerts + 5-day forecast
     res.status(200).json({
       name: currentData.name,
+      coord: currentData.coord ? {
+        lat: currentData.coord.lat,
+        lon: currentData.coord.lon
+      } : null,
       sys: {
         country: currentData.sys?.country || ""
       },

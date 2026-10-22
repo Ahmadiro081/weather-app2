@@ -13,6 +13,9 @@
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="icon" type="image/svg+xml" href="assets/images/weather-logo.svg">
   <link rel="stylesheet" href="css/style.css">
+  <!-- Leaflet.js Interactive Mapping Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
   <div class="app-container">
@@ -42,21 +45,21 @@
           <span class="brand-badge">Mini-Project</span>
         </div>
         <div class="header-actions">
-          <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="dev-header-badge" title="Developed by Ahmad Ibrahim (08146557980) - View Profile / CV">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
+          <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="dev-header-badge" title="Project Instructor: Ahmad Ibrahim (08146557980) - View Profile / CV">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
-            <span class="dev-header-text">Dev: Ahmad Ibrahim</span>
+            <span class="dev-header-text">Instructor: Ahmad Ibrahim</span>
           </a>
-          <button id="openTeamModalBtn" class="team-btn" type="button" aria-haspopup="dialog" aria-controls="teamModal" aria-label="View Project Team">
+          <button id="openTeamModalBtn" class="team-btn" type="button" aria-haspopup="dialog" aria-controls="teamModal" aria-label="View Project Developers">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="9" cy="7" r="4"></circle>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>Project Team</span>
+            <span>Project Developers</span>
           </button>
         </div>
       </div>
@@ -73,16 +76,22 @@
         <!-- Academic Project Identification -->
         <div class="academic-meta-strip">
           <span class="academic-inst">FEDERAL UNIVERSITY DUTSIN-MA (FUDMA)</span>
-          <span class="academic-sub">GET 411 • Artificial Intelligence Mini Project • Group 14 • 2026/2027 Academic Session</span>
-          <span class="academic-lecturer-tag">Course Lecturer: <strong>Nura Muhammad</strong></span>
-          <button id="heroTeamBtn" type="button" class="academic-view-btn" aria-label="View Group 14 Student Members">
+          <span class="academic-sub">GET 411 • Artificial Intelligence Mini Project • Group 14 Developers • 2026/2027 Academic Session</span>
+          <div class="academic-leadership-tags">
+            <span class="academic-lecturer-tag" title="Distinguished Course Lecturer & Academic Supervisor">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              Honorable Lecturer: <strong>Engr. Nura Muhammad</strong>
+            </span>
+            <span class="academic-instructor-tag" title="Project Instructor & Technical Lead">
+              Instructor: <strong>Ahmad Ibrahim</strong>
+            </span>
+          </div>
+          <button id="heroTeamBtn" type="button" class="academic-view-btn" aria-label="View Group 14 Project Developers">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
             </svg>
-            <span>View Group 14 Members (10 Students)</span>
+            <span>View Project Developers (Group 14)</span>
           </button>
         </div>
       </section>
@@ -344,6 +353,20 @@
         </div>
       </article>
 
+      <!-- Contextual Weather Tip Helper Component -->
+      <aside id="weatherTipCard" class="weather-tip-card" role="note" aria-live="polite" style="display: none;">
+        <div class="weather-tip-icon-wrap" id="weatherTipIconWrap" aria-hidden="true">
+          <span id="weatherTipEmoji" class="weather-tip-emoji">💡</span>
+        </div>
+        <div class="weather-tip-body">
+          <div class="weather-tip-badge-row">
+            <span class="weather-tip-badge">CONTEXTUAL ADVICE</span>
+            <span id="weatherTipCategory" class="weather-tip-category">Weather Tip</span>
+          </div>
+          <p id="weatherTipText" class="weather-tip-text">Stay hydrated and carry an umbrella!</p>
+        </div>
+      </aside>
+
       <!-- 5-Day Weather Forecast Section -->
       <section id="forecastSection" class="forecast-section" aria-label="5-Day Weather Forecast">
         <div class="forecast-header">
@@ -359,6 +382,77 @@
           <span class="forecast-badge">Upcoming High &amp; Low</span>
         </div>
         <div id="forecastGrid" class="forecast-grid"></div>
+      </section>
+
+      <!-- Geographical Location Mini-Map Section (Leaflet.js) -->
+      <section id="locationMapSection" class="location-map-section" aria-label="City Geographical Location" style="display: none;">
+        <div class="map-card-header">
+          <div class="map-title-wrap">
+            <div class="map-icon-bubble" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                <line x1="8" y1="2" x2="8" y2="18"></line>
+                <line x1="16" y1="6" x2="16" y2="22"></line>
+              </svg>
+            </div>
+            <div>
+              <h3 class="map-card-title">Geographical Location &amp; Coordinates</h3>
+              <p class="map-card-subtitle">Interactive Leaflet.js Mini-Map pinpointing selected municipality</p>
+            </div>
+          </div>
+          <div class="map-meta-badges">
+            <span id="mapCityBadge" class="map-city-badge">Abuja, NG</span>
+            <span id="mapCoordsBadge" class="map-coords-badge">9.0765° N, 7.3986° E</span>
+          </div>
+        </div>
+
+        <div class="map-container-wrapper">
+          <div id="cityMiniMap" class="city-mini-map" role="region" aria-label="Interactive city mini-map"></div>
+          
+          <!-- Map Floating Overlay Controls -->
+          <div class="map-floating-overlay">
+            <div class="map-overlay-info">
+              <div class="map-overlay-pin-indicator" aria-hidden="true"></div>
+              <div>
+                <strong id="mapOverlayTitle" class="map-overlay-title">Abuja, Nigeria</strong>
+                <span id="mapOverlayCoords" class="map-overlay-coords">Lat: 9.0765 • Lon: 7.3986</span>
+              </div>
+            </div>
+            <div class="map-overlay-actions">
+              <button type="button" id="mapRecenterBtn" class="map-action-btn" title="Recenter map on city pin" aria-label="Recenter map on city marker">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span>Recenter</span>
+              </button>
+              <div class="map-zoom-group">
+                <button type="button" id="mapZoomInBtn" class="map-zoom-btn" title="Zoom in" aria-label="Zoom in">+</button>
+                <button type="button" id="mapZoomOutBtn" class="map-zoom-btn" title="Zoom out" aria-label="Zoom out">−</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Coordinates & Metadata Footer Details -->
+        <div class="map-card-footer">
+          <div class="map-footer-col">
+            <span class="map-footer-label">Latitude</span>
+            <span id="mapLatDisplay" class="map-footer-val">9.0765° N</span>
+          </div>
+          <div class="map-footer-col">
+            <span class="map-footer-label">Longitude</span>
+            <span id="mapLonDisplay" class="map-footer-val">7.3986° E</span>
+          </div>
+          <div class="map-footer-col">
+            <span class="map-footer-label">Mapping Engine</span>
+            <span class="map-footer-val">Leaflet.js v1.9.4</span>
+          </div>
+          <div class="map-footer-col">
+            <span class="map-footer-label">Tile Source</span>
+            <span class="map-footer-val">OpenStreetMap</span>
+          </div>
+        </div>
       </section>
 
       <!-- Initial Welcome State (Before any search) -->
@@ -388,55 +482,62 @@
               <span class="academic-inst-badge-inline">FEDERAL UNIVERSITY DUTSIN-MA (FUDMA)</span>
               <h3 class="academic-card-heading">GET 411 • ARTIFICIAL INTELLIGENCE MINI PROJECT</h3>
               <div class="academic-meta-inline">
-                <span class="academic-chip">GROUP 14</span>
+                <span class="academic-chip">GROUP 14 DEVELOPERS</span>
                 <span class="academic-chip">Session: 2026/2027</span>
-                <span class="academic-chip">Lecturer: Nura Muhammad</span>
+                <span class="academic-chip">Supervisor: Engr. Nura Muhammad</span>
               </div>
             </div>
-            <button id="openModalFromSectionBtn" type="button" class="team-open-modal-action" aria-label="Open Fullscreen Roster Dialog">
-              <span>View Roster Dialog ↗</span>
+            <button id="openModalFromSectionBtn" type="button" class="team-open-modal-action" aria-label="Open Fullscreen Developers Dialog">
+              <span>View Developers Dialog ↗</span>
             </button>
           </div>
 
           <div class="academic-card-body">
-            <!-- Developer Attribution Card -->
-            <div class="developer-attribution-card">
-              <div class="developer-card-avatar" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="16 18 22 12 16 6"></polyline>
-                  <polyline points="8 6 2 12 8 18"></polyline>
+            <!-- Honorable Course Lecturer & Academic Supervisor Banner -->
+            <div class="lecturer-honorable-banner">
+              <div class="lecturer-honorable-badge" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                 </svg>
               </div>
-              <div class="developer-card-content">
-                <div class="developer-role-tag">APPLICATION DEVELOPER</div>
-                <h4 class="developer-card-name">Ahmad Ibrahim</h4>
-                <div class="developer-card-meta">
-                  <a href="tel:08146557980" class="developer-meta-btn developer-phone-btn" title="Call Ahmad Ibrahim">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                    </svg>
-                    <span>08146557980</span>
-                  </a>
-                  <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="developer-meta-btn developer-cv-btn" title="Visit Ahmad Ibrahim Portfolio / CV">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    <span>View Profile / CV ↗</span>
-                  </a>
-                </div>
+              <div class="lecturer-honorable-content">
+                <span class="lecturer-honorable-tag">HONORABLE COURSE LECTURER &amp; ACADEMIC SUPERVISOR</span>
+                <h4 class="lecturer-honorable-name">Engr. Nura Muhammad</h4>
+                <p class="lecturer-honorable-dept">Faculty of Engineering &amp; Technology • Department of Electrical/Computer Engineering • Federal University Dutsin-Ma (FUDMA)</p>
+              </div>
+            </div>
+
+            <!-- Project Instructor & Technical Lead (Compact / Short Nerve) -->
+            <div class="instructor-compact-bar">
+              <div class="instructor-compact-left">
+                <span class="instructor-compact-badge">PROJECT INSTRUCTOR</span>
+                <strong class="instructor-compact-name">Ahmad Ibrahim</strong>
+              </div>
+              <div class="instructor-compact-right">
+                <a href="tel:08146557980" class="instructor-link-pill" title="Call Instructor Ahmad Ibrahim">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                  <span>08146557980</span>
+                </a>
+                <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="instructor-cv-pill" title="View Instructor Profile / CV">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                  <span>Profile / CV ↗</span>
+                </a>
               </div>
             </div>
 
             <h4 class="academic-roster-title">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
               </svg>
-              <span>GROUP 14 MEMBERS (10 STUDENTS)</span>
+              <span>GROUP 14 DEVELOPERS (SOFTWARE ENGINEERING ROSTER)</span>
             </h4>
 
             <div class="team-members-grid">
@@ -447,7 +548,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Adamu Aliyu</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Adamu Aliyu</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/32546
@@ -467,7 +571,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Yakubu Bilyaminu Korau</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Yakubu Bilyaminu Korau</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/33389
@@ -487,7 +594,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Abdulrazak Nura</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Abdulrazak Nura</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/32426
@@ -507,7 +617,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Gideon Ogala</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Gideon Ogala</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/32926
@@ -527,7 +640,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Ibrahim Nasir</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Ibrahim Nasir</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/36136
@@ -547,7 +663,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Dauda Ismail</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Dauda Ismail</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/32787
@@ -567,7 +686,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Sulaiman Rabiu Gideh</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Sulaiman Rabiu Gideh</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/34260
@@ -587,7 +709,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Benson Oshuo Echuo-Odu</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Benson Oshuo Echuo-Odu</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2024/32156
@@ -607,7 +732,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Aliyu Abubakar</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Aliyu Abubakar</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       ENG/2025/36887
@@ -627,7 +755,10 @@
                 </div>
                 <div class="member-info">
                   <div class="member-header">
-                    <h5 class="member-name">Favour Hephzibah Emmanuel</h5>
+                    <div class="member-name-wrap">
+                      <h5 class="member-name">Favour Hephzibah Emmanuel</h5>
+                      <span class="dev-role-badge">Developer</span>
+                    </div>
                     <span class="member-matric" title="Matriculation Number">
                       <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                       AGR/2024/32419
@@ -655,11 +786,11 @@
             <span class="team-inst-badge">FEDERAL UNIVERSITY DUTSIN-MA (FUDMA)</span>
             <h2 id="teamModalTitle" class="team-course-title">GET 411 • ARTIFICIAL INTELLIGENCE MINI PROJECT</h2>
             <div class="team-meta-row">
-              <span class="team-meta-pill">GROUP 14</span>
+              <span class="team-meta-pill">GROUP 14 DEVELOPERS</span>
               <span>•</span>
               <span>Academic Session: <strong>2026/2027</strong></span>
               <span>•</span>
-              <span>Lecturer: <strong>Nura Muhammad</strong></span>
+              <span>Honorable Lecturer: <strong>Engr. Nura Muhammad</strong></span>
             </div>
           </div>
           <button id="closeTeamModalBtn" class="team-close-btn" type="button" aria-label="Close modal">&times;</button>
@@ -667,44 +798,51 @@
 
         <!-- Modal Body: Group Members -->
         <div class="team-modal-body">
-          <!-- Developer Attribution Card in Modal -->
-          <div class="developer-attribution-card developer-modal-card">
-            <div class="developer-card-avatar" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6"></polyline>
-                <polyline points="8 6 2 12 8 18"></polyline>
+          <!-- Honorable Course Lecturer & Academic Supervisor Banner in Modal -->
+          <div class="lecturer-honorable-banner lecturer-modal-banner">
+            <div class="lecturer-honorable-badge" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
               </svg>
             </div>
-            <div class="developer-card-content">
-              <div class="developer-role-tag">APPLICATION DEVELOPER</div>
-              <h4 class="developer-card-name">Ahmad Ibrahim</h4>
-              <div class="developer-card-meta">
-                <a href="tel:08146557980" class="developer-meta-btn developer-phone-btn" title="Call Ahmad Ibrahim">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                  </svg>
-                  <span>08146557980</span>
-                </a>
-                <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="developer-meta-btn developer-cv-btn" title="Visit Ahmad Ibrahim Portfolio / CV">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                    <polyline points="15 3 21 3 21 9"></polyline>
-                    <line x1="10" y1="14" x2="21" y2="3"></line>
-                  </svg>
-                  <span>View Profile / CV ↗</span>
-                </a>
-              </div>
+            <div class="lecturer-honorable-content">
+              <span class="lecturer-honorable-tag">HONORABLE COURSE LECTURER &amp; ACADEMIC SUPERVISOR</span>
+              <h4 class="lecturer-honorable-name">Engr. Nura Muhammad</h4>
+              <p class="lecturer-honorable-dept">Faculty of Engineering &amp; Technology • Department of Electrical/Computer Engineering • FUDMA</p>
+            </div>
+          </div>
+
+          <!-- Project Instructor Compact Bar in Modal -->
+          <div class="instructor-compact-bar instructor-modal-bar">
+            <div class="instructor-compact-left">
+              <span class="instructor-compact-badge">PROJECT INSTRUCTOR</span>
+              <strong class="instructor-compact-name">Ahmad Ibrahim</strong>
+            </div>
+            <div class="instructor-compact-right">
+              <a href="tel:08146557980" class="instructor-link-pill" title="Call Instructor Ahmad Ibrahim">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                <span>08146557980</span>
+              </a>
+              <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="instructor-cv-pill" title="View Instructor Profile / CV">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Profile / CV ↗</span>
+              </a>
             </div>
           </div>
 
           <div class="team-section-heading">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
             </svg>
-            <span>GROUP MEMBERS</span>
+            <span>GROUP 14 DEVELOPERS • SOFTWARE ENGINEERING ROSTER</span>
           </div>
 
           <div class="team-members-grid">
@@ -715,7 +853,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Adamu Aliyu</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Adamu Aliyu</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/32546
@@ -735,7 +876,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Yakubu Bilyaminu Korau</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Yakubu Bilyaminu Korau</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/33389
@@ -755,7 +899,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Abdulrazak Nura</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Abdulrazak Nura</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/32426
@@ -775,7 +922,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Gideon Ogala</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Gideon Ogala</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/32926
@@ -795,7 +945,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Ibrahim Nasir</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Ibrahim Nasir</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/36136
@@ -815,7 +968,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Dauda Ismail</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Dauda Ismail</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/32787
@@ -835,7 +991,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Sulaiman Rabiu Gideh</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Sulaiman Rabiu Gideh</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/34260
@@ -855,7 +1014,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Benson Oshuo Echuo-Odu</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Benson Oshuo Echuo-Odu</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2024/32156
@@ -875,7 +1037,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Aliyu Abubakar</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Aliyu Abubakar</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     ENG/2025/36887
@@ -895,7 +1060,10 @@
               </div>
               <div class="member-info">
                 <div class="member-header">
-                  <h5 class="member-name">Favour Hephzibah Emmanuel</h5>
+                  <div class="member-name-wrap">
+                    <h5 class="member-name">Favour Hephzibah Emmanuel</h5>
+                    <span class="dev-role-badge">Developer</span>
+                  </div>
                   <span class="member-matric" title="Matriculation Number">
                     <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>
                     AGR/2024/32419
@@ -912,8 +1080,8 @@
 
         <!-- Modal Footer -->
         <div class="team-modal-footer">
-          <span>Lecturer: <strong>Nura Muhammad</strong></span>
-          <span>Federal University Dutsin-Ma • Group 14</span>
+          <span>Honorable Lecturer &amp; Supervisor: <strong>Engr. Nura Muhammad</strong></span>
+          <span>Project Instructor: <strong>Ahmad Ibrahim</strong> • Group 14 Developers</span>
         </div>
       </div>
     </div>
@@ -926,33 +1094,33 @@
       <span id="toastMessage" class="toast-message">Weather summary copied to clipboard!</span>
     </div>
 
-    <!-- Required Academic & Developer Footer -->
+    <!-- Required Academic & Leadership Footer -->
     <footer class="footer">
-      <div class="developer-footer-card">
-        <div class="developer-footer-header">
-          <span class="developer-footer-label">Developed by</span>
-          <strong class="developer-footer-name">Ahmad Ibrahim</strong>
+      <div class="footer-academic-card">
+        <div class="footer-supervisor-line">
+          <svg class="footer-shield-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <span class="footer-supervisor-title">Respected Course Lecturer &amp; Academic Supervisor:</span>
+          <strong class="footer-supervisor-name">Engr. Nura Muhammad</strong>
         </div>
-        <div class="developer-footer-links">
-          <a href="tel:08146557980" class="developer-footer-pill" title="Call Ahmad Ibrahim">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-            </svg>
-            <span>08146557980</span>
+        <div class="footer-instructor-line">
+          <span class="footer-instructor-badge">INSTRUCTOR</span>
+          <strong class="footer-instructor-name">Ahmad Ibrahim</strong>
+          <span class="footer-dot" aria-hidden="true">•</span>
+          <a href="tel:08146557980" class="footer-instructor-link" title="Call Instructor Ahmad Ibrahim">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            08146557980
           </a>
-          <span class="developer-footer-sep" aria-hidden="true">•</span>
-          <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="developer-footer-cv-btn" title="View Ahmad Ibrahim's CV / Profile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-              <polyline points="15 3 21 3 21 9"></polyline>
-              <line x1="10" y1="14" x2="21" y2="3"></line>
-            </svg>
-            <span>Profile / CV ↗</span>
+          <span class="footer-dot" aria-hidden="true">•</span>
+          <a href="https://ahmad-ibrahim-cv.vercel.app/" target="_blank" rel="noopener noreferrer" class="footer-instructor-cv" title="View Instructor Profile / CV">
+            Profile / CV ↗
           </a>
+        </div>
+        <div class="footer-devs-line">
+          <span>Engineered &amp; Developed by <strong>Group 14 Developers</strong> (10 Student Software Engineers)</span>
         </div>
       </div>
       <p class="footer-text">Weather App | GET 411 Artificial Intelligence Mini Project</p>
-      <p class="footer-subtext">Federal University Dutsin-Ma (FUDMA) • Group 14 • 2026/2027 Session • Lecturer: Nura Muhammad</p>
+      <p class="footer-subtext">Federal University Dutsin-Ma (FUDMA) • 2026/2027 Academic Session</p>
     </footer>
 
   </div>

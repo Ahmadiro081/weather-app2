@@ -107,11 +107,79 @@ const uvIndexRiskElem = document.getElementById("uvIndexRisk");
 const aqiIndexValueElem = document.getElementById("aqiIndexValue");
 const aqiRiskBadgeElem = document.getElementById("aqiRiskBadge");
 
+// Contextual Weather Tip helper elements
+const weatherTipCard = document.getElementById("weatherTipCard");
+const weatherTipEmoji = document.getElementById("weatherTipEmoji");
+const weatherTipCategory = document.getElementById("weatherTipCategory");
+const weatherTipText = document.getElementById("weatherTipText");
+
 const historyContainer = document.getElementById("historyContainer");
 const historyChips = document.getElementById("historyChips");
 
 const forecastSection = document.getElementById("forecastSection");
 const forecastGrid = document.getElementById("forecastGrid");
+
+// Geographical Location Mini-Map elements (Leaflet.js)
+const locationMapSection = document.getElementById("locationMapSection");
+const mapCityBadge = document.getElementById("mapCityBadge");
+const mapCoordsBadge = document.getElementById("mapCoordsBadge");
+const cityMiniMap = document.getElementById("cityMiniMap");
+const mapOverlayTitle = document.getElementById("mapOverlayTitle");
+const mapOverlayCoords = document.getElementById("mapOverlayCoords");
+const mapRecenterBtn = document.getElementById("mapRecenterBtn");
+const mapZoomInBtn = document.getElementById("mapZoomInBtn");
+const mapZoomOutBtn = document.getElementById("mapZoomOutBtn");
+const mapLatDisplay = document.getElementById("mapLatDisplay");
+const mapLonDisplay = document.getElementById("mapLonDisplay");
+
+// Leaflet map instance and state variables
+let cityMapInstance = null;
+let cityMapMarker = null;
+let currentMapCoords = { lat: 9.0765, lon: 7.3986, city: "Abuja", country: "Nigeria" };
+
+// Known coordinates fallback dictionary for fast and reliable resolution
+const CITY_COORDINATES_MAP = {
+  abuja: { lat: 9.0765, lon: 7.3986, country: "Nigeria" },
+  lagos: { lat: 6.5244, lon: 3.3792, country: "Nigeria" },
+  kano: { lat: 12.0022, lon: 8.5920, country: "Nigeria" },
+  ibadan: { lat: 7.3775, lon: 3.9470, country: "Nigeria" },
+  "port harcourt": { lat: 4.8156, lon: 7.0498, country: "Nigeria" },
+  kaduna: { lat: 10.5105, lon: 7.4165, country: "Nigeria" },
+  "benin city": { lat: 6.3350, lon: 5.6037, country: "Nigeria" },
+  maiduguri: { lat: 11.8311, lon: 13.1510, country: "Nigeria" },
+  zaria: { lat: 11.0855, lon: 7.7199, country: "Nigeria" },
+  jos: { lat: 9.8965, lon: 8.8583, country: "Nigeria" },
+  ilorin: { lat: 8.4799, lon: 4.5418, country: "Nigeria" },
+  enugu: { lat: 6.4584, lon: 7.5464, country: "Nigeria" },
+  "dutsin-ma": { lat: 12.4542, lon: 7.4975, country: "Nigeria" },
+  "dutsin ma": { lat: 12.4542, lon: 7.4975, country: "Nigeria" },
+  katsina: { lat: 12.9908, lon: 7.6018, country: "Nigeria" },
+  sokoto: { lat: 13.0609, lon: 5.2476, country: "Nigeria" },
+  calabar: { lat: 4.9757, lon: 8.3417, country: "Nigeria" },
+  warri: { lat: 5.5167, lon: 5.7500, country: "Nigeria" },
+  aba: { lat: 5.1167, lon: 7.3667, country: "Nigeria" },
+  onitsha: { lat: 6.1667, lon: 6.7833, country: "Nigeria" },
+  abeokuta: { lat: 7.1557, lon: 3.3458, country: "Nigeria" },
+  akure: { lat: 7.2571, lon: 5.2058, country: "Nigeria" },
+  osogbo: { lat: 7.7827, lon: 4.5418, country: "Nigeria" },
+  asaba: { lat: 6.1989, lon: 6.7329, country: "Nigeria" },
+  minna: { lat: 9.6139, lon: 6.5569, country: "Nigeria" },
+  bauchi: { lat: 10.3158, lon: 9.8442, country: "Nigeria" },
+  gombe: { lat: 10.2897, lon: 11.1673, country: "Nigeria" },
+  yola: { lat: 9.2003, lon: 12.4836, country: "Nigeria" },
+  lafia: { lat: 8.4932, lon: 8.5153, country: "Nigeria" },
+  makurdi: { lat: 7.7327, lon: 8.5214, country: "Nigeria" },
+  lokoja: { lat: 7.8000, lon: 6.7333, country: "Nigeria" },
+  london: { lat: 51.5074, lon: -0.1278, country: "United Kingdom" },
+  "new york": { lat: 40.7128, lon: -74.0060, country: "United States" },
+  tokyo: { lat: 35.6762, lon: 139.6503, country: "Japan" },
+  paris: { lat: 48.8566, lon: 2.3522, country: "France" },
+  dubai: { lat: 25.2048, lon: 55.2708, country: "United Arab Emirates" },
+  accra: { lat: 5.6037, lon: -0.1870, country: "Ghana" },
+  nairobi: { lat: -1.2921, lon: 36.8219, country: "Kenya" },
+  cairo: { lat: 30.0444, lon: 31.2357, country: "Egypt" },
+  johannesburg: { lat: -26.2041, lon: 28.0473, country: "South Africa" }
+};
 
 // ============================================================================
 // 3. API INTEGRATION LOGIC (VERCEL SERVERLESS PROXY)
@@ -277,6 +345,31 @@ function updateTemperatureDisplays() {
     // 5. Update forecast cards
     if (Array.isArray(lastWeatherData.forecast) && lastWeatherData.forecast.length > 0) {
       renderForecast(lastWeatherData.forecast);
+    }
+
+    // 6. Update Leaflet map marker popup if map is active
+    if (cityMapMarker && typeof L !== "undefined" && currentMapCoords) {
+      const displayTemp = convertTemperature(rawTemp);
+      const cond = lastWeatherData.weather?.[0]?.main || "Clear";
+      const iconCd = lastWeatherData.weather?.[0]?.icon || "01d";
+      const cName = lastWeatherData.name || currentMapCoords.city || "";
+      const cCountry = countryNames[lastWeatherData.sys?.country] || lastWeatherData.sys?.country || currentMapCoords.country || "";
+      const latStr = formatCoordinate(currentMapCoords.lat, true);
+      const lonStr = formatCoordinate(currentMapCoords.lon, false);
+      const coordsCombined = `${latStr}, ${lonStr}`;
+      const popupHtml = `
+        <div class="weather-map-popup">
+          <div class="weather-map-popup-header">
+            <img class="weather-map-popup-icon" src="https://openweathermap.org/img/wn/${iconCd}@2x.png" alt="${cond}">
+            <div>
+              <div class="weather-map-popup-city">${cName}${cCountry ? ', ' + cCountry : ''}</div>
+              <span class="weather-map-popup-badge">${displayTemp}°${unitSymbol} • ${cond}</span>
+            </div>
+          </div>
+          <div class="weather-map-popup-coords">📍 ${coordsCombined}</div>
+        </div>
+      `;
+      cityMapMarker.setPopupContent(popupHtml);
     }
   } else {
     // If user flips toggle prior to first fetch, keep initial demo values in sync
@@ -517,6 +610,12 @@ function renderWeatherData(data) {
   // Check and display severe weather alert banner if any active advisories
   renderSevereAlerts(data.alerts);
 
+  // Render contextual helper tip below the main presentation card
+  renderContextualTip(data);
+
+  // Render interactive geographical mini-map using Leaflet.js
+  initOrUpdateCityMap(data.coord, city, countryDisplayName, temp, condition, iconCode);
+
   // Add to session search history
   addToSessionHistory(city);
 }
@@ -614,12 +713,307 @@ function hideSevereAlert() {
 }
 
 /**
+ * Renders a contextual helper tip component below the main weather presentation card
+ * based on current atmospheric conditions, temperature, UV, and air quality.
+ * 
+ * @param {Object} data - Processed weather data payload
+ */
+function renderContextualTip(data) {
+  if (!weatherTipCard || !weatherTipText || !weatherTipEmoji) return;
+  if (!data || !data.main) {
+    weatherTipCard.style.display = "none";
+    return;
+  }
+
+  const tempC = typeof data.main.temp === "number" ? data.main.temp : 25;
+  const weatherObj = data.weather && data.weather.length > 0 ? data.weather[0] : null;
+  const weatherId = weatherObj && typeof weatherObj.id === "number" ? weatherObj.id : 800;
+  const condition = weatherObj ? (weatherObj.main || "").toLowerCase() : "";
+  const windSpeed = typeof data.wind?.speed === "number" ? data.wind.speed : 0;
+  const uvi = typeof data.uvi === "number" ? data.uvi : 0;
+  const aqi = typeof data.aqi === "number" ? data.aqi : 1;
+
+  let emoji = "💡";
+  let tip = "Check current conditions and stay prepared for daily weather changes.";
+  let category = "General Advice";
+  let themeClass = "tip-theme-good";
+
+  // 1. Extreme storm hazards & active alerts
+  if (weatherId === 781 || weatherId === 771) {
+    emoji = "🚨";
+    category = "Storm Safety";
+    tip = "Extreme storm conditions reported: seek sturdy shelter immediately and stay away from windows.";
+    themeClass = "tip-theme-warning";
+  } else if (Array.isArray(data.alerts) && data.alerts.length > 0) {
+    emoji = "⚠️";
+    category = "Weather Advisory";
+    tip = `Active alert: ${data.alerts[0].event || "Meteorological Advisory"}. Exercise extra caution today.`;
+    themeClass = "tip-theme-warning";
+  }
+  // 2. Thunderstorm
+  else if (weatherId >= 200 && weatherId < 300) {
+    emoji = "⛈️";
+    category = "Thunderstorm Safety";
+    tip = "Thunderstorms active: stay indoors, avoid open fields, and keep an umbrella handy.";
+    themeClass = "tip-theme-rain";
+  }
+  // 3. Rain & Drizzle
+  else if (weatherId >= 300 && weatherId < 600) {
+    emoji = "☔";
+    category = "Rain Gear";
+    tip = "Rainy weather: carry an umbrella, wear waterproof shoes, and drive with care.";
+    themeClass = "tip-theme-rain";
+  }
+  // 4. Snow
+  else if (weatherId >= 600 && weatherId < 700) {
+    emoji = "❄️";
+    category = "Winter Advisory";
+    tip = "Snow conditions: dress in thermal layers, wear insulated boots, and beware of slick roads.";
+    themeClass = "tip-theme-cold";
+  }
+  // 5. Reduced visibility (Fog, Mist, Haze, Dust)
+  else if (weatherId >= 700 && weatherId < 800) {
+    emoji = "🌫️";
+    category = "Low Visibility";
+    tip = "Reduced visibility from atmospheric haze or fog: use low-beam headlights and reduce driving speed.";
+    themeClass = "tip-theme-warning";
+  }
+  // 6. Extreme Heat
+  else if (tempC >= 35) {
+    emoji = "🥵";
+    category = "Heat Precautions";
+    tip = "Extreme heat advisory: stay hydrated, avoid direct sun exposure between 12 PM - 3 PM, and seek cool spaces.";
+    themeClass = "tip-theme-heat";
+  }
+  // 7. High Heat
+  else if (tempC >= 30) {
+    emoji = "💧";
+    category = "Hydration Reminder";
+    tip = "High temperatures: drink plenty of water throughout the day, wear light breathable clothes, and stay hydrated.";
+    themeClass = "tip-theme-heat";
+  }
+  // 8. Freezing cold
+  else if (tempC <= 5) {
+    emoji = "🧤";
+    category = "Cold Protection";
+    tip = "Freezing temperatures: bundle up with a heavy coat, gloves, and a warm hat before heading outside.";
+    themeClass = "tip-theme-cold";
+  }
+  // 9. Chilly
+  else if (tempC <= 15) {
+    emoji = "🧥";
+    category = "Chilly Weather";
+    tip = "Brisk and cool: a light jacket, sweater, or hoodie is recommended when stepping out.";
+    themeClass = "tip-theme-cold";
+  }
+  // 10. High UV Index
+  else if (uvi >= 8) {
+    emoji = "🕶️";
+    category = "Sun Protection";
+    tip = "Very high UV radiation: wear sunglasses, apply sunscreen (SPF 30+), and wear a wide-brimmed hat.";
+    themeClass = "tip-theme-heat";
+  }
+  // 11. High Air Pollution (AQI 4 or 5)
+  else if (aqi >= 4) {
+    emoji = "😷";
+    category = "Air Quality";
+    tip = "Elevated air pollution levels: consider wearing a protective mask outdoors and limit strenuous exercise.";
+    themeClass = "tip-theme-warning";
+  }
+  // 12. Strong winds
+  else if (windSpeed >= 8.5) {
+    emoji = "💨";
+    category = "Wind Advisory";
+    tip = "Gusty winds: secure outdoor patio items and hold on to your umbrella tightly.";
+    themeClass = "tip-theme-rain";
+  }
+  // 13. Mild / Pleasant Clear Skies
+  else if (condition === "clear" && tempC >= 18 && tempC < 30) {
+    emoji = "✨";
+    category = "Pleasant Weather";
+    tip = "Clear skies and comfortable temperatures: ideal weather for outdoor recreation or a study session!";
+    themeClass = "tip-theme-good";
+  }
+  // 14. Cloudy / Overcast
+  else if (condition === "clouds") {
+    emoji = "☁️";
+    category = "Cloudy Day";
+    tip = "Mild overcast conditions: great weather for outdoor walks and commuting without harsh sun glare.";
+    themeClass = "tip-theme-good";
+  }
+
+  weatherTipEmoji.textContent = emoji;
+  weatherTipText.textContent = tip;
+  if (weatherTipCategory) weatherTipCategory.textContent = category;
+
+  // Apply contextual theme class
+  weatherTipCard.className = `weather-tip-card ${themeClass}`;
+  weatherTipCard.style.display = "flex";
+}
+
+/**
+ * Formats decimal degrees into standard compass notation (e.g. 9.0765° N, 7.3986° E).
+ * 
+ * @param {number} val - Coordinate value
+ * @param {boolean} isLat - True for latitude, false for longitude
+ * @returns {string} - Formatted coordinate
+ */
+function formatCoordinate(val, isLat) {
+  if (typeof val !== "number" || isNaN(val)) return "--";
+  const absVal = Math.abs(val).toFixed(4);
+  const dir = isLat ? (val >= 0 ? "° N" : "° S") : (val >= 0 ? "° E" : "° W");
+  return `${absVal}${dir}`;
+}
+
+/**
+ * Initializes or updates the interactive Leaflet.js mini-map pinpointing the selected municipality.
+ * 
+ * @param {Object} coord - { lat: number, lon: number } from API
+ * @param {string} cityName - Name of the city
+ * @param {string} countryName - Name of the country
+ * @param {number|string} temp - Current temperature
+ * @param {string} condition - Current condition (e.g. Clear, Rain)
+ * @param {string} iconCode - OpenWeather condition icon code
+ */
+function initOrUpdateCityMap(coord, cityName, countryName, temp, condition, iconCode) {
+  if (!locationMapSection) return;
+
+  // 1. Resolve coordinates from payload or fallback dictionary
+  let lat = null;
+  let lon = null;
+
+  if (coord && typeof coord.lat === "number" && typeof coord.lon === "number") {
+    lat = coord.lat;
+    lon = coord.lon;
+  } else {
+    const key = (cityName || "").toLowerCase().trim();
+    if (CITY_COORDINATES_MAP[key]) {
+      lat = CITY_COORDINATES_MAP[key].lat;
+      lon = CITY_COORDINATES_MAP[key].lon;
+    }
+  }
+
+  // If coordinates cannot be established, keep section hidden
+  if (lat === null || lon === null) {
+    locationMapSection.style.display = "none";
+    return;
+  }
+
+  // Update tracking state
+  currentMapCoords = {
+    lat: lat,
+    lon: lon,
+    city: cityName,
+    country: countryName || ""
+  };
+
+  const latStr = formatCoordinate(lat, true);
+  const lonStr = formatCoordinate(lon, false);
+  const coordsCombined = `${latStr}, ${lonStr}`;
+  const fullLocationName = countryName ? `${cityName}, ${countryName}` : cityName;
+
+  // Update metadata badges and labels
+  if (mapCityBadge) mapCityBadge.textContent = cityName;
+  if (mapCoordsBadge) mapCoordsBadge.textContent = coordsCombined;
+  if (mapOverlayTitle) mapOverlayTitle.textContent = fullLocationName;
+  if (mapOverlayCoords) mapOverlayCoords.textContent = `Lat: ${lat.toFixed(4)} • Lon: ${lon.toFixed(4)}`;
+  if (mapLatDisplay) mapLatDisplay.textContent = latStr;
+  if (mapLonDisplay) mapLonDisplay.textContent = lonStr;
+
+  // Reveal map card
+  locationMapSection.style.display = "block";
+
+  // Check if Leaflet mapping library is loaded
+  if (typeof L === "undefined") {
+    if (cityMiniMap) {
+      cityMiniMap.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:0.875rem;padding:1rem;text-align:center;">
+          <div>
+            <p style="font-weight:700;color:#0f172a;margin-bottom:0.25rem;">📍 ${fullLocationName}</p>
+            <p style="font-variant-numeric:tabular-nums;margin-bottom:0.5rem;color:#0369a1;">${coordsCombined}</p>
+            <p style="font-size:0.775rem;">Interactive map will render when online connectivity is restored.</p>
+          </div>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  try {
+    const popupHtml = `
+      <div class="weather-map-popup">
+        <div class="weather-map-popup-header">
+          <img class="weather-map-popup-icon" src="https://openweathermap.org/img/wn/${iconCode || '01d'}@2x.png" alt="${condition}">
+          <div>
+            <div class="weather-map-popup-city">${cityName}${countryName ? ', ' + countryName : ''}</div>
+            <span class="weather-map-popup-badge">${temp}°${currentUnit} • ${condition}</span>
+          </div>
+        </div>
+        <div class="weather-map-popup-coords">📍 ${coordsCombined}</div>
+      </div>
+    `;
+
+    // Initialize Leaflet map instance on first query
+    if (!cityMapInstance) {
+      cityMapInstance = L.map("cityMiniMap", {
+        center: [lat, lon],
+        zoom: 12,
+        zoomControl: false,
+        scrollWheelZoom: false,
+        attributionControl: true
+      });
+
+      // Add high-contrast OpenStreetMap raster tile layer
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+      }).addTo(cityMapInstance);
+
+      // Create distinctive pulse-ring marker pin
+      const pinIcon = L.divIcon({
+        className: "custom-map-pin",
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        popupAnchor: [0, -12]
+      });
+
+      cityMapMarker = L.marker([lat, lon], {
+        icon: pinIcon,
+        title: cityName
+      }).addTo(cityMapInstance);
+
+      cityMapMarker.bindPopup(popupHtml);
+      cityMapMarker.openPopup();
+    } else {
+      // Smoothly pan and re-center on the new location
+      cityMapInstance.setView([lat, lon], 12, { animate: true, duration: 0.8 });
+
+      if (cityMapMarker) {
+        cityMapMarker.setLatLng([lat, lon]);
+        cityMapMarker.setPopupContent(popupHtml);
+        cityMapMarker.openPopup();
+      }
+    }
+
+    // Force Leaflet container re-measurement after CSS rendering settles
+    setTimeout(() => {
+      if (cityMapInstance) {
+        cityMapInstance.invalidateSize();
+      }
+    }, 250);
+  } catch (err) {
+    console.warn("Leaflet mini-map error:", err);
+  }
+}
+
+/**
  * Activates loading state: shows spinner and disables search buttons.
  */
 function showLoadingState() {
   isLoading = true;
   hideError();
   hideSevereAlert();
+  if (weatherTipCard) weatherTipCard.style.display = "none";
   loadingState.classList.add("active");
   searchButton.disabled = true;
   searchButton.innerHTML = `
@@ -653,6 +1047,8 @@ function hideLoadingState() {
 function showError(type, customMsg = "") {
   hideLoadingState();
   hideSevereAlert();
+  if (weatherTipCard) weatherTipCard.style.display = "none";
+  if (locationMapSection) locationMapSection.style.display = "none";
   if (forecastSection) {
     forecastSection.style.display = "none";
     forecastSection.classList.remove("active");
@@ -835,7 +1231,11 @@ function generateWeatherSummary() {
     lines.push(`⚠️ Active Meteorological Alert: ${alertTitle}`);
   }
 
-  lines.push(`\nShared via FUDMA Weather Dashboard • GET 411 Artificial Intelligence Group 14`);
+  if (weatherTipText && weatherTipCard && weatherTipCard.style.display !== "none") {
+    lines.push(`💡 Contextual Tip: ${weatherTipText.textContent.trim()}`);
+  }
+
+  lines.push(`\nShared via FUDMA Weather Dashboard • GET 411 Artificial Intelligence Group 14 Developers`);
 
   return lines.join("\n");
 }
@@ -1162,5 +1562,37 @@ window.addEventListener("offline", handleOnlineStatusChange);
 if (typeof navigator !== "undefined" && !navigator.onLine) {
   handleOnlineStatusChange();
 }
+
+// ============================================================================
+// 10. LEAFLET MINI-MAP CONTROLS
+// ============================================================================
+
+if (mapRecenterBtn) {
+  mapRecenterBtn.addEventListener("click", () => {
+    if (cityMapInstance && currentMapCoords) {
+      cityMapInstance.setView([currentMapCoords.lat, currentMapCoords.lon], 12, { animate: true, duration: 0.6 });
+      if (cityMapMarker) {
+        cityMapMarker.openPopup();
+      }
+    }
+  });
+}
+
+if (mapZoomInBtn) {
+  mapZoomInBtn.addEventListener("click", () => {
+    if (cityMapInstance) {
+      cityMapInstance.zoomIn();
+    }
+  });
+}
+
+if (mapZoomOutBtn) {
+  mapZoomOutBtn.addEventListener("click", () => {
+    if (cityMapInstance) {
+      cityMapInstance.zoomOut();
+    }
+  });
+}
+
 
 

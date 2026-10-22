@@ -6,36 +6,36 @@
 **Project Title:** Weather App Using Public API (Vercel Serverless Architecture)  
 **Group:** Group 14  
 **Academic Session:** 2026/2027  
-**Lecturer / Supervisor:** Nura Muhammad  
-**Lead Developer:** Ahmad Ibrahim (Phone: [08146557980](tel:08146557980) • CV / Profile: [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/))  
+**Honorable Course Lecturer & Academic Supervisor:** Engr. Nura Muhammad (Faculty of Engineering & Technology)  
+**Project Instructor:** Ahmad Ibrahim (Phone: [08146557980](tel:08146557980) • Profile: [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/))  
+**Project Developers:** Group 14 Software Engineering Team  
 
 ---
 
-## Academic Project Information & Group 14 Members
+## Academic Project Information & Project Leadership
 
-### Project Identifiers
+### Project Identifiers & Supervision
 - **Institution:** Federal University Dutsin-Ma (FUDMA)
 - **Course Code:** GET 411 (Artificial Intelligence Mini Project)
 - **Group Allocation:** Group 14
 - **Academic Session:** 2026/2027
-- **Course Lecturer:** Nura Muhammad
-- **Application Developer:** Ahmad Ibrahim
-- **Developer Contact:** [08146557980](tel:08146557980)
-- **Developer Portfolio / CV:** [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/)
+- **Honorable Course Lecturer & Academic Supervisor:** Engr. Nura Muhammad (Faculty of Engineering & Technology, FUDMA)
+- **Project Instructor:** Ahmad Ibrahim ([08146557980](tel:08146557980) • [Instructor CV / Portfolio](https://ahmad-ibrahim-cv.vercel.app/))
+- **Software Engineering Team:** Group 14 Developers
 
-### Group 14 Student Members Roster
-| No. | Student Name | Matriculation Number | Department |
-|:---:|:---|:---|:---|
-| 01 | Adamu Aliyu | ENG/2024/32546 | Mechanical Engineering |
-| 02 | Yakubu Bilyaminu Korau | ENG/2024/33389 | Mechanical Engineering |
-| 03 | Abdulrazak Nura | ENG/2024/32426 | Electrical and Electronics Engineering |
-| 04 | Gideon Ogala | ENG/2024/32926 | Electrical and Electronic Engineering |
-| 05 | Ibrahim Nasir | ENG/2024/36136 | Chemical Engineering |
-| 06 | Dauda Ismail | ENG/2024/32787 | Civil Engineering |
-| 07 | Sulaiman Rabiu Gideh | ENG/2024/34260 | Civil Engineering |
-| 08 | Benson Oshuo Echuo-Odu | ENG/2024/32156 | Mechatronics Engineering |
-| 09 | Aliyu Abubakar | ENG/2025/36887 | Civil Engineering |
-| 10 | Favour Hephzibah Emmanuel | AGR/2024/32419 | Agricultural and Bio-Environmental Engineering |
+### Group 14 Project Developers Roster
+| No. | Developer Name | Role | Matriculation Number | Department |
+|:---:|:---|:---:|:---|:---|
+| 01 | Adamu Aliyu | Developer | ENG/2024/32546 | Mechanical Engineering |
+| 02 | Yakubu Bilyaminu Korau | Developer | ENG/2024/33389 | Mechanical Engineering |
+| 03 | Abdulrazak Nura | Developer | ENG/2024/32426 | Electrical and Electronics Engineering |
+| 04 | Gideon Ogala | Developer | ENG/2024/32926 | Electrical and Electronic Engineering |
+| 05 | Ibrahim Nasir | Developer | ENG/2024/36136 | Chemical Engineering |
+| 06 | Dauda Ismail | Developer | ENG/2024/32787 | Civil Engineering |
+| 07 | Sulaiman Rabiu Gideh | Developer | ENG/2024/34260 | Civil Engineering |
+| 08 | Benson Oshuo Echuo-Odu | Developer | ENG/2024/32156 | Mechatronics Engineering |
+| 09 | Aliyu Abubakar | Developer | ENG/2025/36887 | Civil Engineering |
+| 10 | Favour Hephzibah Emmanuel | Developer | AGR/2024/32419 | Agricultural and Bio-Environmental Engineering |
 
 ---
 
@@ -205,6 +205,9 @@ The application underwent systematic testing across functional verification, ser
 | **TC-09** | Mobile Layout Responsive | View on viewport width 375px (Phone) | Stacks cards vertically, wraps buttons, zero horizontal scrollbar | Clean vertical stacking; smooth readability | **PASS** |
 | **TC-10** | Desktop Layout Responsive | View on viewport width 1440px (Desktop) | 4-column metric grid, centered card, proportional typography | Balanced layout with optimal spacing and contrast | **PASS** |
 | **TC-11** | Zero Client Key Exposure | Inspect page source & network tab | No `OPENWEATHER_API_KEY` present in HTML, JS, or browser storage | Zero sensitive credentials exposed to client | **PASS** |
+| **TC-12** | Air Quality Index (AQI) Card | Search municipality | Serverless proxy queries Air Pollution API; renders AQI scale 1-5 with risk pill | Correct AQI value, badge, and descriptor rendered in grid | **PASS** |
+| **TC-13** | Contextual Weather Tip Helper | Evaluate temperature & weather condition | Displays appropriate dynamic tip (e.g., umbrella for rain, hydration for heat, freeze protection) below presentation card | Contextual tip rendered with themed badge and practical advice | **PASS** |
+| **TC-14** | Geographical Mini-Map (Leaflet.js) | Search city / click quick city | Renders interactive Leaflet map centered at city coordinates with pulsing pin, popup details, recenter, and zoom controls | Interactive map loaded with pin marker, coordinates, and smooth navigation | **PASS** |
 
 ---
 

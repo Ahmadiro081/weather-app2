@@ -5,38 +5,37 @@
 **Project:** Artificial Intelligence Mini Project  
 **Group:** Group 14  
 **Academic Session:** 2026/2027  
-**Lecturer:** Nura Muhammad  
-**Application Developer:** Ahmad Ibrahim  
-**Developer Contact:** [08146557980](tel:08146557980)  
-**Developer Profile / CV:** [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/)  
+**Honorable Course Lecturer & Academic Supervisor:** Engr. Nura Muhammad (Faculty of Engineering & Technology)  
+**Project Instructor:** Ahmad Ibrahim (Phone: [08146557980](tel:08146557980) • Profile: [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/))  
+**Project Developers:** Group 14 Software Engineering Team  
 **Target Deployment Platform:** Vercel (Production Serverless Architecture)
 
 ---
 
-## Academic Project Details & Group 14 Members
+## Academic Project Details & Project Leadership
 
-### Course & Supervision
+### Course & Academic Supervision
 - **Institution:** Federal University Dutsin-Ma (FUDMA)
 - **Course Code:** GET 411
 - **Project Title:** Artificial Intelligence Mini Project - Weather App Using Public API
 - **Group:** Group 14
 - **Academic Session:** 2026/2027
-- **Lecturer:** Nura Muhammad
-- **Developed by:** Ahmad Ibrahim ([08146557980](tel:08146557980) • [CV / Profile](https://ahmad-ibrahim-cv.vercel.app/))
+- **Honorable Course Lecturer & Academic Supervisor:** Engr. Nura Muhammad (Faculty of Engineering & Technology, FUDMA)
+- **Project Instructor:** Ahmad Ibrahim ([08146557980](tel:08146557980) • [Instructor CV / Portfolio](https://ahmad-ibrahim-cv.vercel.app/))
 
-### Group 14 Student Members
-| S/N | Name | Matric Number | Department |
-|:---:|:---|:---|:---|
-| 01 | Adamu Aliyu | ENG/2024/32546 | Mechanical Engineering |
-| 02 | Yakubu Bilyaminu Korau | ENG/2024/33389 | Mechanical Engineering |
-| 03 | Abdulrazak Nura | ENG/2024/32426 | Electrical and Electronics Engineering |
-| 04 | Gideon Ogala | ENG/2024/32926 | Electrical and Electronic Engineering |
-| 05 | Ibrahim Nasir | ENG/2024/36136 | Chemical Engineering |
-| 06 | Dauda Ismail | ENG/2024/32787 | Civil Engineering |
-| 07 | Sulaiman Rabiu Gideh | ENG/2024/34260 | Civil Engineering |
-| 08 | Benson Oshuo Echuo-Odu | ENG/2024/32156 | Mechatronics Engineering |
-| 09 | Aliyu Abubakar | ENG/2025/36887 | Civil Engineering |
-| 10 | Favour Hephzibah Emmanuel | AGR/2024/32419 | Agricultural and Bio-Environmental Engineering |
+### Group 14 Project Developers (Software Engineering Roster)
+| S/N | Developer Name | Role | Matric Number | Department |
+|:---:|:---|:---:|:---|:---|
+| 01 | Adamu Aliyu | Developer | ENG/2024/32546 | Mechanical Engineering |
+| 02 | Yakubu Bilyaminu Korau | Developer | ENG/2024/33389 | Mechanical Engineering |
+| 03 | Abdulrazak Nura | Developer | ENG/2024/32426 | Electrical and Electronics Engineering |
+| 04 | Gideon Ogala | Developer | ENG/2024/32926 | Electrical and Electronic Engineering |
+| 05 | Ibrahim Nasir | Developer | ENG/2024/36136 | Chemical Engineering |
+| 06 | Dauda Ismail | Developer | ENG/2024/32787 | Civil Engineering |
+| 07 | Sulaiman Rabiu Gideh | Developer | ENG/2024/34260 | Civil Engineering |
+| 08 | Benson Oshuo Echuo-Odu | Developer | ENG/2024/32156 | Mechatronics Engineering |
+| 09 | Aliyu Abubakar | Developer | ENG/2025/36887 | Civil Engineering |
+| 10 | Favour Hephzibah Emmanuel | Developer | AGR/2024/32419 | Agricultural and Bio-Environmental Engineering |
 
 ---
 
@@ -74,6 +73,11 @@ To ensure professional software engineering security standards, the frontend app
   - Visibility distance in kilometers (km)
   - Real-time **UV Index** with World Health Organization (WHO) risk level indicator (Low, Moderate, High, Very High, Extreme) powered by the OpenWeather API
   - **Air Quality Index (AQI)** card powered by the OpenWeather Air Pollution API (`/data/2.5/air_pollution`) with risk level categorization (1 - Good, 2 - Fair, 3 - Moderate, 4 - Poor, 5 - Very Poor)
+- **Contextual Weather Tip Helper Component:**
+  - Located directly below the main weather presentation card.
+  - Dynamically evaluates temperature, weather condition code, humidity, wind speed, UV index, and air quality index across 14 priority tiers.
+  - Displays actionable personal guidance (e.g., umbrella reminder during rain/drizzle, freeze & thermal layering alert for cold temperatures, hydration and cooling advisory for high heat, UV sunscreen warning, and respiratory protection during poor AQI).
+  - Adapts visual styling with contextual badges and color-coded themes (Rain Blue, Heat Orange/Red, Freeze Cyan, Warning Amber, and Pleasant Green).
 - **Severe Weather Alert Banner Notification:**
   - Automatically queries official meteorological alerts from the OpenWeather API (One Call & active severe weather classification system) for the searched municipality.
   - Displays a high-visibility, accessible banner notification with pulsing warning icon, issuing organization, alert event title, and description.
@@ -86,6 +90,11 @@ To ensure professional software engineering security standards, the frontend app
   - Aggregates daily forecasts for the next 5 days.
   - Displays day of the week, formatted date, condition icon, and text.
   - Highlights upcoming **High (Warm Red)** and **Low (Cool Blue)** temperatures in °C.
+- **Geographical Location Mini-Map Section (Leaflet.js Integration):**
+  - Interactive map powered by **Leaflet.js** and **OpenStreetMap** tile layers pinpointing the queried city's exact geographical coordinates.
+  - Features a custom pulsing radar marker pin with coordinates popup showing municipality name, active temperature, weather condition icon, and latitude/longitude.
+  - Glassmorphic floating control overlay with one-touch **Recenter**, **Zoom In (+)**, and **Zoom Out (−)** controls.
+  - Comprehensive metadata footer displaying cardinal compass coordinates (e.g., 9.0765° N, 7.3986° E), mapping engine, and tile attribution.
 - **Progressive Web App (PWA) Capabilities:**
   - Fully installable on Android, iOS, Windows, macOS, and Linux.
   - Complete Web App Manifest (`manifest.webmanifest`) with standalone display mode.
