@@ -6,7 +6,6 @@
 **Group:** Group 14  
 **Academic Session:** 2026/2027  
 **Honorable Course Lecturer & Academic Supervisor:** Engr. Nura Muhammad (Faculty of Engineering • Federal University Dutsin-Ma (FUDMA))  
-**Project Instructor:** Ahmad Ibrahim (Phone: [08146557980](tel:08146557980) • Profile: [https://ahmad-ibrahim-cv.vercel.app/](https://ahmad-ibrahim-cv.vercel.app/))  
 **Project Developers:** Group 14 Software Engineering Team  
 **Target Deployment Platform:** Vercel (Production Serverless Architecture)
 
@@ -21,7 +20,6 @@
 - **Group:** Group 14
 - **Academic Session:** 2026/2027
 - **Honorable Course Lecturer & Academic Supervisor:** Engr. Nura Muhammad (Faculty of Engineering • Federal University Dutsin-Ma (FUDMA))
-- **Project Instructor:** Ahmad Ibrahim ([08146557980](tel:08146557980) • [Instructor CV / Portfolio](https://ahmad-ibrahim-cv.vercel.app/))
 
 ### Group 14 Project Developers (Software Engineering Roster)
 | S/N | Developer Name | Role | Matric Number | Department |

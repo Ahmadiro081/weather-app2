@@ -26,6 +26,28 @@
   --transition: all 0.2s ease-in-out;
 }
 
+/* ==========================================================================
+   Dark Mode Theme System (CSS Custom Properties)
+   Persisted via localStorage to improve visibility during nighttime use.
+   ========================================================================== */
+[data-theme="dark"] {
+  --primary: #38bdf8;
+  --primary-dark: #0284c7;
+  --primary-light: #0c2d48;
+  --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0f172a 100%);
+  --card-gradient: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  --accent: #fbbf24;
+  --accent-hover: #f59e0b;
+  --surface: #1e293b;
+  --background: #0b1120;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.6), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
+}
+
 /* Reset & Box Sizing */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -42,6 +64,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* App Wrapper */
@@ -187,6 +210,83 @@ body {
 
 .dev-header-badge:hover svg {
   stroke: #ffffff;
+}
+
+/* User-facing Dark Mode Theme Toggle Switch */
+.theme-toggle-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: var(--transition);
+  min-height: 44px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.theme-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+
+.sun-icon {
+  display: block;
+  color: #f59e0b;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+.moon-icon {
+  display: none;
+  color: #38bdf8;
+  transition: transform 0.3s ease, opacity 0.2s ease;
+}
+
+.theme-toggle-label {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Dark mode active state on toggle button */
+[data-theme="dark"] .sun-icon {
+  display: none;
+}
+
+[data-theme="dark"] .moon-icon {
+  display: block;
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #38bdf8;
 }
 
 .key-toggle-btn {
@@ -3087,4 +3187,388 @@ body {
     padding: 0.85rem 1rem;
   }
 }
+
+/* ==========================================================================
+   Comprehensive Dark Mode Component Overrides ([data-theme="dark"])
+   Ensures deep dark theme contrast and flawless night visibility
+   ========================================================================== */
+
+/* 1. Header & Navigation */
+[data-theme="dark"] .header {
+  background: rgba(15, 23, 42, 0.92);
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .brand-title {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .brand-badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+[data-theme="dark"] .team-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .team-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* 2. Hero & Academic Meta Strip */
+[data-theme="dark"] .academic-meta-strip {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .academic-inst {
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .academic-sub {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .academic-lecturer-tag {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .academic-view-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .academic-view-btn:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* 3. Search Card & Inputs */
+[data-theme="dark"] .search-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .city-input {
+  background: #0f172a;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .city-input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .city-input:focus {
+  background: #0b1120;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+[data-theme="dark"] .quick-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .quick-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .history-chip {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .history-chip:hover {
+  color: #38bdf8;
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+/* 4. Weather Card & Metrics Grid */
+[data-theme="dark"] .weather-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .weather-primary-body {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+/* Condition-specific dark gradient overrides */
+[data-theme="dark"] .weather-card.weather-theme-clear .weather-primary-body {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.14) 0%, #1e293b 85%);
+}
+
+[data-theme="dark"] .weather-card.weather-theme-rain .weather-primary-body {
+  background: linear-gradient(180deg, rgba(2, 132, 199, 0.15) 0%, #1e293b 85%);
+}
+
+[data-theme="dark"] .weather-card.weather-theme-drizzle .weather-primary-body {
+  background: linear-gradient(180deg, rgba(8, 145, 178, 0.15) 0%, #1e293b 85%);
+}
+
+[data-theme="dark"] .weather-card.weather-theme-thunderstorm .weather-primary-body {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.16) 0%, #1e293b 85%);
+}
+
+[data-theme="dark"] .weather-card.weather-theme-snow .weather-primary-body {
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.15) 0%, #1e293b 85%);
+}
+
+[data-theme="dark"] .weather-card.weather-theme-clouds .weather-primary-body {
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.12) 0%, #1e293b 85%);
+}
+
+[data-theme="dark"] .weather-card.weather-theme-mist .weather-primary-body {
+  background: linear-gradient(180deg, rgba(100, 116, 139, 0.14) 0%, #1e293b 85%);
+}
+
+[data-theme="dark"] .weather-metrics-grid {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .metric-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .metric-card:hover {
+  background: #243247;
+  border-color: #38bdf8;
+}
+
+[data-theme="dark"] .metric-value {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .metric-title {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .metric-icon-wrap {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+}
+
+/* 5. 5-Day Forecast Cards */
+[data-theme="dark"] .forecast-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .forecast-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .forecast-card:hover {
+  background: #243247;
+  border-color: #38bdf8;
+}
+
+[data-theme="dark"] .forecast-day {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .forecast-date {
+  color: #94a3b8;
+}
+
+/* 6. Contextual Weather Tip Card */
+[data-theme="dark"] .weather-tip-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .weather-tip-text {
+  color: #cbd5e1;
+}
+
+/* 7. Leaflet Mini-Map Section */
+[data-theme="dark"] .location-map-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .map-card-header {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .map-card-title {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .map-city-pill {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .map-coords-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .map-ctrl-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .map-ctrl-btn:hover {
+  background: #334155;
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .map-card-footer {
+  background: #0f172a;
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .map-status-pill {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+/* Invert Leaflet map tiles subtly for night mode */
+[data-theme="dark"] .city-mini-map .leaflet-tile-pane {
+  filter: brightness(0.7) invert(1) contrast(2.4) hue-rotate(200deg) saturate(0.35) brightness(0.8);
+}
+
+[data-theme="dark"] .city-mini-map .leaflet-control-attribution {
+  background: rgba(15, 23, 42, 0.85) !important;
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .city-mini-map .leaflet-control-attribution a {
+  color: #38bdf8 !important;
+}
+
+/* 8. Academic Section & Roster */
+[data-theme="dark"] .academic-project-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .lecturer-honorable-banner {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #334155;
+}
+
+[data-theme="dark"] .lecturer-honorable-name {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .lecturer-honorable-dept {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .member-card {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .member-card:hover {
+  background: #1e293b;
+  border-color: #38bdf8;
+}
+
+[data-theme="dark"] .member-name {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .member-reg {
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .member-dept {
+  color: #94a3b8;
+}
+
+/* 9. Team Modal */
+[data-theme="dark"] .team-modal-content {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .team-modal-header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .team-close-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .team-close-btn:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .team-modal-footer {
+  background: #0f172a;
+  border-top-color: #334155;
+  color: #94a3b8;
+}
+
+/* 10. Footer */
+[data-theme="dark"] .footer-academic-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .footer-supervisor-name {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .footer-devs-line {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .footer-text,
+[data-theme="dark"] .footer-subtext {
+  color: #64748b;
+}
+
+/* 11. Initial Placeholder */
+[data-theme="dark"] .initial-placeholder {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .placeholder-text {
+  color: #94a3b8;
+}
+
+/* 12. Unit Toggle Switch Slider */
+[data-theme="dark"] .unit-toggle-slider {
+  background: #0f172a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .unit-toggle-switch {
+  background: rgba(15, 23, 42, 0.8);
+}
+
 

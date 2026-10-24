@@ -83,6 +83,10 @@ const unitOptC = document.getElementById("unitOptC");
 const unitOptF = document.getElementById("unitOptF");
 const tempUnitElem = document.getElementById("tempUnit");
 
+// User-facing Dark / Light Theme Toggle elements
+const themeToggleBtn = document.getElementById("themeToggleBtn");
+const themeToggleLabel = document.getElementById("themeToggleLabel");
+
 // Share button and toast notification elements
 const shareWeatherBtn = document.getElementById("shareWeatherBtn");
 const shareBtnText = document.getElementById("shareBtnText");
@@ -1661,6 +1665,130 @@ if (mapZoomOutBtn) {
     }
   });
 }
+
+// ============================================================================
+// 11. PERSISTENT THEME CONTROLLER (DARK / LIGHT MODE)
+// ============================================================================
+
+const THEME_STORAGE_KEY = "fudma_weather_theme";
+
+/**
+ * Checks system preference for dark color scheme
+ * @returns {'dark'|'light'}
+ */
+function getSystemThemePreference() {
+  if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    return "dark";
+  }
+  return "light";
+}
+
+/**
+ * Apply the selected theme to documentElement, update UI labels/attributes,
+ * and persist into localStorage if requested.
+ *
+ * @param {'dark'|'light'} theme - Target theme ('dark' or 'light')
+ * @param {boolean} [persist=true] - Whether to write to localStorage
+ */
+function applyTheme(theme, persist = true) {
+  const isDark = theme === "dark";
+  
+  if (isDark) {
+    document.documentElement.setAttribute("data-theme", "dark");
+  } else {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+
+  // Update button accessible state and label
+  if (themeToggleBtn) {
+    themeToggleBtn.setAttribute("aria-checked", isDark ? "true" : "false");
+    themeToggleBtn.setAttribute(
+      "aria-label",
+      isDark ? "Switch to light mode" : "Switch to dark mode"
+    );
+    themeToggleBtn.title = isDark ? "Switch to light mode" : "Switch to dark mode";
+  }
+
+  if (themeToggleLabel) {
+    // Shows what the user will switch to on click
+    themeToggleLabel.textContent = isDark ? "Light" : "Dark";
+  }
+
+  // Update theme-color meta tag for Android status bar / browser chrome
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute("content", isDark ? "#0f172a" : "#0284c7");
+  }
+
+  // Persist preference to browser localStorage
+  if (persist) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (e) {
+      // Storage unavailable or restricted
+    }
+  }
+}
+
+/**
+ * Toggle between 'dark' and 'light' theme
+ */
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const nextTheme = (currentTheme === "dark") ? "light" : "dark";
+  applyTheme(nextTheme, true);
+
+  // Show friendly toast feedback
+  if (typeof showToast === "function") {
+    if (nextTheme === "dark") {
+      showToast("Dark mode activated 🌙");
+    } else {
+      showToast("Light mode activated ☀️");
+    }
+  }
+}
+
+/**
+ * Initialize theme based on localStorage preference or system fallback
+ */
+function initThemeController() {
+  let activeTheme = "light";
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === "dark" || saved === "light") {
+      activeTheme = saved;
+    } else {
+      activeTheme = getSystemThemePreference();
+    }
+  } catch (e) {
+    activeTheme = getSystemThemePreference();
+  }
+
+  // Apply without overriding localStorage on initial load
+  applyTheme(activeTheme, false);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", toggleTheme);
+  }
+
+  // Listen to OS system color scheme changes when user hasn't explicitly saved a preference
+  if (typeof window !== "undefined" && window.matchMedia) {
+    try {
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+        try {
+          const userSaved = localStorage.getItem(THEME_STORAGE_KEY);
+          if (!userSaved) {
+            applyTheme(e.matches ? "dark" : "light", false);
+          }
+        } catch (err) {}
+      });
+    } catch (err) {}
+  }
+}
+
+// Initialize theme immediately
+initThemeController();
+
 
 
 
